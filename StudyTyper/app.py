@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+## Security Function for password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 
@@ -32,7 +34,7 @@ def login():
 
     message = ""
 
-    if request.method == 'POST':
+    if request.method == 'POST': ## Post request
         username = request.form.get('username')
         password = request.form.get('password')
 
