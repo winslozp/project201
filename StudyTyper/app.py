@@ -34,12 +34,11 @@ def login():
 
     message = ""
 
-    if request.method == 'POST': ## Post request means form submission
+    if request.method == 'POST': ## Post request
         username = request.form.get('username')
         password = request.form.get('password')
 
         user = User.query.filter_by(username=username).first()
-        # check_password_hash compares the hashed password stored in the database with the password provided by the user during login. It returns True if they match, indicating a successful login, and False otherwise.
 
         if user and check_password_hash(user.password, password):
             message = "Login successful!"
