@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -12,7 +12,7 @@ db = SQLAlchemy(app)
 
 
 # -----------------
-# Database model
+# Database Model
 # -----------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +25,7 @@ with app.app_context():
 
 
 # -----------------
-# Login route
+# LOGIN
 # -----------------
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -33,7 +33,6 @@ def login():
     message = ""
 
     if request.method == 'POST':
-
         username = request.form.get('username')
         password = request.form.get('password')
 
@@ -44,7 +43,36 @@ def login():
         else:
             message = "Invalid credentials"
 
-    return render_template("index.html", message=message)
+    return render_template("login.html", message=message)
+
+
+# -----------------
+# REGISTER
+# -----------------
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+
+    message = ""
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        # check if exists
+        existing = User.query.filter_by(username=username).first()
+
+        if existing:
+            message = "Username already exists"
+        else:
+            hashed = generate_password_hash(password)
+            new_user = User(username=username, password=hashed)
+
+            db.session.add(new_user)
+            db.session.commit()
+
+            return redirect(url_for('login'))
+
+    return render_template("register.html", message=message)
 
 
 if __name__ == "__main__":
