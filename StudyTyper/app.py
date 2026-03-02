@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
-# database config
+app.config['SECRET_KEY'] = 'dev-secret-key'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -16,17 +16,16 @@ db = SQLAlchemy(app)
 # -----------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True)
-    password = db.Column(db.String(200))
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(200), nullable=False)
 
 
-# create database once
 with app.app_context():
     db.create_all()
 
 
 # -----------------
-# Route
+# Login route
 # -----------------
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -35,8 +34,8 @@ def login():
 
     if request.method == 'POST':
 
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         user = User.query.filter_by(username=username).first()
 
