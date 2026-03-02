@@ -8,6 +8,12 @@ body {
 
 input, button {
     display: block;
-    margin: 10px;
+    margin: 20px;
     padding: 8px;
 }
+
+#Add a backround color to the body of the page
+body {
+    background-color: #c9ac4f;
+}
+
