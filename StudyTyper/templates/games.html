@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Games{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='gamesStyles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div>
+        <h1>Typing Games Arena</h1>
+        <p>Turn practice into competition with speed rounds, accuracy challenges, and flashcard-based game modes.</p>
+    </div>
+    <div class="hero-badge">Practice + Play</div>
+</div>
+
+<div class="games-grid">
+    <div class="game-card">
+        <div class="game-icon blue">⌨</div>
+        <h3>Speed Sprint</h3>
+        <p>Type as many words as possible before the timer runs out and chase your highest WPM.</p>
+        <div class="game-meta">
+            <span class="game-badge">60 Seconds</span>
+            <span class="game-badge">Fast Pace</span>
+        </div>
+        <button>Start Game</button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-icon orange">🎯</div>
+        <h3>Accuracy Challenge</h3>
+        <p>Focus on precision. One typo can drag your score down, so every keystroke matters.</p>
+        <div class="game-meta">
+            <span class="game-badge">High Focus</span>
+            <span class="game-badge">Precision</span>
+        </div>
+        <button>Start Game</button>
+    </div>
+
+    <div class="game-card">
+        <div class="game-icon purple">🧠</div>
+        <h3>Flashcard Blitz</h3>
+        <p>See a term, type the definition, and race against the clock while reviewing class material.</p>
+        <div class="game-meta">
+            <span class="game-badge">Study Hybrid</span>
+            <span class="game-badge">Memory Boost</span>
+        </div>
+        <button>Start Game</button>
+    </div>
+</div>
+
+<div class="games-leaderboard">
+    <h2 class="section-title">Leaderboard Preview</h2>
+    <p class="section-subtitle">A polished extra section to help your team imagine future features.</p>
+
+    <div class="leaderboard-row">
+        <div class="rank-bubble">1</div>
+        <div><strong>Anthony</strong><br><span class="muted">Speed Sprint</span></div>
+        <div class="score">72 WPM</div>
+        <div class="accuracy-good">12%</div>
+    </div>
+
+    <div class="leaderboard-row">
+        <div class="rank-bubble">2</div>
+        <div><strong>Zander</strong><br><span class="muted">Accuracy Challenge</span></div>
+        <div class="score">78 WPM</div>
+        <div class="accuracy-good">67%</div>
+    </div>
+
+    <div class="leaderboard-row">
+        <div class="rank-bubble">3</div>
+        <div><strong>Kayden</strong><br><span class="muted">Flashcard Blitz</span></div>
+        <div class="score">640 WPM</div>
+        <div class="accuracy-good">1%</div>
+    </div>
+</div>
+{% endblock %}

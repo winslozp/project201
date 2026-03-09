@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Study Typer{% endblock %}</title>
+    <!-- Default/global styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <!-- For each page to implement -->
+    {% block css %}{% endblock %}
+</head>
+<body>
+
+    <nav>
+        <a href="/notes">Notes</a> |
+        <a href="/flashcards">Flashcards</a> |
+        <a href="/games">Games</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
+    <p>Welcome, {{ username }}!</p>
+    
+    <div class="page-shell">
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

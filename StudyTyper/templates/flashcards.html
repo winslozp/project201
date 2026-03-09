@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Flashcards{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='flashcardsStyles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div>
+        <h1>Flashcards Studio</h1>
+        <p>Create clean study decks from your notes and practice definitions with a more interactive layout.</p>
+    </div>
+    <div class="hero-badge">Memory Mode</div>
+</div>
+
+<div class="flashcards-layout">
+    <div class="flashcard-form-card">
+        <h2 class="section-title">Build a New Flashcard</h2>
+        <p class="section-subtitle">Add a term and definition to grow your study deck.</p>
+
+        <form method="POST" class="flashcard-form">
+            <div>
+                <label for="term">Term</label>
+                <input type="text" id="term" name="term" placeholder="Example: Agile Development" required>
+            </div>
+
+            <div>
+                <label for="definition">Definition</label>
+                <textarea id="definition" name="definition" rows="6" placeholder="Write the definition here..."></textarea>
+            </div>
+
+            <button type="submit">Add Flashcard</button>
+        </form>
+
+        <div class="flashcard-stack-preview">
+            <div class="mini-card">
+                <h4>Database</h4>
+                <p class="muted">An organized collection of data that can be accessed and managed.</p>
+            </div>
+
+            <div class="mini-card">
+                <h4>Scrum</h4>
+                <p class="muted">An agile framework used to manage complex product development.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="study-card-panel">
+        <h2 class="section-title">Study Preview</h2>
+        <p class="section-subtitle">Example of what one active flashcard could look like.</p>
+
+        <div class="flashcard-big">
+            <span class="flashcard-tag">Current Card</span>
+
+            <div>
+                <div class="flashcard-term">Polymorphism</div>
+                <div class="flashcard-definition">
+                    The ability for objects of different classes to be treated through the same interface, often using overridden methods.
+                </div>
+            </div>
+
+            <div>
+                <div class="study-actions">
+                    <button>Flip Card</button>
+                    <button class="alt">Type Definition</button>
+                </div>
+
+                <div class="study-stats">
+                    <span class="stat-pill">Deck Size: 24</span>
+                    <span class="stat-pill">Mastered: 11</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

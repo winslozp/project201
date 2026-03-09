@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 ## Security Function for password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -40,8 +40,11 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
+    # Updated so that on login user gets sent to notes page
         if user and check_password_hash(user.password, password):
-            message = "Login successful!"
+            session['username'] = user.username
+            # ^ This line stores the user
+            return redirect(url_for('notes'))
         else:
             message = "Invalid credentials"
 
@@ -75,6 +78,56 @@ def register():
             return redirect(url_for('login'))
 
     return render_template("register.html", message=message)
+
+
+# -----------------
+# NOTES PAGE
+# -----------------
+@app.route('/notes')
+def notes():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    return render_template("notes.html", username=session['username'])
+
+
+# -----------------
+# FLASHCARDS PAGE
+# -----------------
+@app.route('/flashcards', methods=['GET', 'POST'])
+def flashcards():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        term = request.form.get('term')
+        definition = request.form.get('definition')
+
+        # For now this just prints to terminal
+        # Implement saving flashcards in db later
+        print("Flashcard added:", term, definition)
+
+    return render_template("flashcards.html", username=session['username'])
+
+
+# -----------------
+# GAMES PAGE
+# -----------------
+@app.route('/games')
+def games():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    return render_template("games.html", username=session['username'])
+
+
+# -----------------
+# LOGOUT
+# -----------------
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":

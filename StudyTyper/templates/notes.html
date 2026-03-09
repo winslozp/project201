@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Notes{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='notesStyles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="page-hero">
+    <div>
+        <h1>Notes Workspace</h1>
+        <p>Capture class notes, build speed, and watch your typing metrics update while you work.</p>
+    </div>
+    <div class="hero-badge">Live Typing Lab</div>
+</div>
+
+<div class="notes-layout">
+    <div class="notes-editor-card">
+        <h2 class="section-title">Focused Notes Editor</h2>
+        <p class="section-subtitle">Use this space to take notes while tracking speed, spelling, and accuracy.</p>
+
+        <div class="notes-toolbar">
+            <button>Start Session</button>
+            <button class="secondary">Pause Session</button>
+            <button>Save Notes</button>
+        </div>
+
+        <textarea class="notes-area" placeholder="Start typing your notes here..."></textarea>
+    </div>
+
+    <div class="notes-side-panel">
+        <div class="notes-stat-card">
+            <h3>Typing Metrics</h3>
+            <div class="notes-stat-grid">
+                <div class="metric-box">
+                    <span class="metric-label">WPM</span>
+                    <span class="metric-value">54</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Accuracy</span>
+                    <span class="metric-value">96%</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Errors</span>
+                    <span class="metric-value">3</span>
+                </div>
+                <div class="metric-box">
+                    <span class="metric-label">Time</span>
+                    <span class="metric-value">12m</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="notes-stat-card">
+            <h3>Session Progress</h3>
+            <div class="progress-list">
+                <div class="progress-item">
+                    <strong>Typing Goal</strong>
+                    Reach 60 WPM this week
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%;"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <strong>Accuracy Goal</strong>
+                    Stay above 95%
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 96%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="notes-stat-card">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+                <button>Upload File</button>
+                <button>Generate Notes</button>
+                <button>Spell Check</button>
+                <button>Export</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
