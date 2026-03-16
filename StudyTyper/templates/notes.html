@@ -3,7 +3,7 @@
 {% block title %}Notes{% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='notesStyles.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/notesStyles.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -84,4 +84,8 @@
         </div>
     </div>
 </div>
+
+
+<!-- JavaScript connection -->
+<script src="{{ url_for('static', filename='scripts/notes.js') }}"></script>
 {% endblock %}
