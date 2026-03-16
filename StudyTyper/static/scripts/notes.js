@@ -68,16 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
         activelyTyping = true;
         setStatus("Typing");
 
-
-        //console.log("Typing");
-
-
         clearTimeout(idleTimeout);
         idleTimeout = setTimeout(() => {
             activelyTyping = false;
             if (!manuallyPaused && sessionStarted) {
                 setStatus("Idle / Timer Paused");
-                //console.log("Not typing");
             }
         }, IDLE_DELAY);
 

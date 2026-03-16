@@ -21,12 +21,13 @@
         <p class="section-subtitle">Use this space to take notes while tracking speed, spelling, and accuracy.</p>
 
         <div class="notes-toolbar">
-            <button>Start Session</button>
-            <button class="secondary">Pause Session</button>
+            <button id="startSessionBtn">Start Session</button>
+            <button id="pauseSessionBtn" class="secondary">Pause Session</button>
             <button>Save Notes</button>
+            <h2 id="typingStatus">Status: </h1>
         </div>
 
-        <textarea class="notes-area" placeholder="Start typing your notes here..."></textarea>
+        <textarea id="notesArea" class="notes-area" placeholder="Start typing your notes here..."></textarea>
     </div>
 
     <div class="notes-side-panel">
@@ -35,7 +36,7 @@
             <div class="notes-stat-grid">
                 <div class="metric-box">
                     <span class="metric-label">WPM</span>
-                    <span class="metric-value">54</span>
+                    <span id="wpmValue" class="metric-value">54</span>
                 </div>
                 <div class="metric-box">
                     <span class="metric-label">Accuracy</span>
@@ -47,7 +48,7 @@
                 </div>
                 <div class="metric-box">
                     <span class="metric-label">Time</span>
-                    <span class="metric-value">12m</span>
+                    <span id="timeValue" class="metric-value">12m</span>
                 </div>
             </div>
         </div>
