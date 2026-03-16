@@ -1,5 +1,6 @@
 console.log("Running");
 
+//Notes.js - Handles the note-taking session logic, including timing, WPM calculation, and session control.
 document.addEventListener("DOMContentLoaded", () => {
     const notesArea = document.getElementById("notesArea");
     const startSessionBtn = document.getElementById("startSessionBtn");
@@ -20,13 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 2 seconds
     const IDLE_DELAY = 2000;
-
+ 
+    // Utility function to count words in the text area
     function getWordCount(text) {
         const trimmed = text.trim();
         if (trimmed === "") return 0;
         return trimmed.split(/\s+/).length;
     }
 
+
+    // Update the time and WPM display
     function updateMetrics() {
         const wordCount = getWordCount(notesArea.value);
 
@@ -41,10 +45,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+
+    // Update the typing status display
     function setStatus(text) {
         typingStatus.textContent = `Status: ${text}`;
     }
 
+
+    // Event listeners for session control and typing activity
     startSessionBtn.addEventListener("click", () => {
         sessionStarted = true;
         manuallyPaused = false;
@@ -53,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
         notesArea.focus();
     });
 
+
+    // Pause the session and stop tracking time until the user starts typing again
     pauseSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
@@ -62,6 +72,8 @@ document.addEventListener("DOMContentLoaded", () => {
         setStatus("Paused");
     });
 
+
+    // Detect typing activity and manage idle state
     notesArea.addEventListener("input", () => {
         if (!sessionStarted || manuallyPaused) return;
 
