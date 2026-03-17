@@ -7,6 +7,21 @@
 {% endblock %}
 
 {% block content %}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="flash-messages">
+            {% for message in messages %}
+                <div class="flash-message">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+
+
+
+
+
 <div class="page-hero">
     <div>
         <h1>Notes Workspace</h1>
@@ -76,11 +91,17 @@
 
         <div class="notes-stat-card">
             <h3>Quick Actions</h3>
+
+            <form action="{{ url_for('upload_notes') }}" method="POST" enctype="multipart/form-data"
+                class="upload-form">
+                <input type="file" name="notes_file" accept=".pdf,.txt">
+                <button type="submit">Upload File</button>
+            </form>
+
             <div class="quick-actions">
-                <button>Upload File</button>
-                <button>Generate Notes</button>
-                <button>Spell Check</button>
-                <button>Export</button>
+                <button type="button">Generate Notes</button>
+                <button type="button">Spell Check</button>
+                <button type="button">Export</button>
             </div>
         </div>
     </div>

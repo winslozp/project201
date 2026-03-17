@@ -1,12 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+import os
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 ## Security Function for password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'dev-secret-key'
+
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'txt', 'pdf'}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB size
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -128,6 +140,40 @@ def games():
 def logout():
     session.pop('username', None)
     return redirect(url_for('login'))
+
+
+# -----------------
+# FILE UPLOADING
+# -----------------
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/upload_notes', methods=['POST'])
+def upload_notes():
+    if 'notes_file' not in request.files:
+        flash('No file part found.')
+        return redirect(url_for('notes'))
+
+    file = request.files['notes_file']
+
+    if file.filename == '':
+        flash('No file selected.')
+        return redirect(url_for('notes'))
+
+    if not allowed_file(file.filename):
+        flash('Invalid file type. Only PDF and TXT files are allowed.')
+        return redirect(url_for('notes'))
+
+    filename = secure_filename(file.filename)
+    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file.save(save_path)
+
+    flash(f'File "{filename}" uploaded successfully.')
+    return redirect(url_for('notes'))
+
+
+
 
 
 if __name__ == "__main__":
