@@ -12,7 +12,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, #ffffff, #ffffff);
+    background: linear-gradient(135deg, #4e73df, #1cc88a);
 }
 
 /* Login container styling */
@@ -44,7 +44,7 @@ input {
 
 input:focus {
     outline: none;
-    border-color: #ffffff;
+    border-color: #4e73df;
     box-shadow: 0 0 0 2px rgba(78, 115, 223, 0.2);
 }
 
@@ -53,7 +53,7 @@ button {
     padding: 10px;
     border: none;
     border-radius: 6px;
-    background-color: #ffffff;
+    background-color: #4e73df;
     color: white;
     font-weight: bold;
     cursor: pointer;
@@ -61,7 +61,7 @@ button {
 }
 
 button:hover {
-    background-color: #ffffff;
+    background-color: #2e59d9;
 }
 
 /* Message text */

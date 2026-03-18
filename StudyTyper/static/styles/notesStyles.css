@@ -21,13 +21,13 @@
 }
 
 .notes-toolbar button {
-    background: linear-gradient(135deg, #ffffff, #ffffff);
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
     color: white;
     box-shadow: 0 10px 20px rgba(79, 70, 229, 0.18);
 }
 
 .notes-toolbar button.secondary {
-    background: linear-gradient(135deg, #ffffff, #ffffff);
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
 }
 
 .notes-area {
