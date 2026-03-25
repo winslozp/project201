@@ -20,34 +20,82 @@ body {
     padding: 30px 24px 50px 24px;
 }
 
-nav {
+.app-topbar {
     position: sticky;
     top: 0;
     z-index: 1000;
     background: rgba(15, 23, 42, 0.88);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 18px 28px;
+    padding: 12px 24px 12px 20px;
     display: flex;
-    justify-content: center;
-    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
     box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
 }
 
-nav a {
+.app-logo-link {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    line-height: 0;
+    border-radius: 10px;
+    transition: background 0.2s ease;
+}
+
+.app-logo-link:hover {
+    background: rgba(96, 165, 250, 0.12);
+}
+
+/* Square emblem (StudyTyperLogo2.png) */
+.app-logo {
+    height: 48px;
+    width: 48px;
+    max-width: 48px;
+    display: block;
+    object-fit: contain;
+}
+
+.app-nav-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 2px;
+    margin-left: auto;
+}
+
+.nav-divider {
+    color: rgba(255, 255, 255, 0.28);
+    font-weight: 400;
+    padding: 0 2px;
+    user-select: none;
+}
+
+.app-topbar a:not(.app-logo-link) {
     color: #e5eefc;
     text-decoration: none;
     font-weight: 600;
-    padding: 10px 16px;
+    padding: 10px 14px;
     border-radius: 10px;
     transition: 0.25s ease;
     letter-spacing: 0.2px;
 }
 
-nav a:hover {
+.app-topbar a:not(.app-logo-link):hover {
     background: rgba(96, 165, 250, 0.18);
     color: #ffffff;
     transform: translateY(-1px);
+}
+
+.welcome-line {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 24px 0 24px;
+    font-size: 0.95rem;
+    color: #475569;
 }
 
 .page-hero {
@@ -179,7 +227,7 @@ select:focus {
         align-items: flex-start;
     }
 
-    nav {
+    .app-topbar {
         flex-wrap: wrap;
     }
 }

@@ -10,14 +10,22 @@
 </head>
 <body>
 
-    <nav>
-        <a href="/notes">Notes</a> |
-        <a href="/flashcards">Flashcards</a> |
-        <a href="/games">Games</a> |
-        <a href="/logout">Logout</a>
+    <nav class="app-topbar" aria-label="Main navigation">
+        <a href="{{ url_for('notes') }}" class="app-logo-link" aria-label="Study Typer — Notes">
+            <img src="{{ url_for('static', filename='Logos/StudyTyperLogo2.png') }}" alt="Study Typer" class="app-logo" width="48" height="48">
+        </a>
+        <div class="app-nav-links">
+            <a href="{{ url_for('notes') }}">Notes</a>
+            <span class="nav-divider" aria-hidden="true">|</span>
+            <a href="{{ url_for('flashcards') }}">Flashcards</a>
+            <span class="nav-divider" aria-hidden="true">|</span>
+            <a href="{{ url_for('games') }}">Games</a>
+            <span class="nav-divider" aria-hidden="true">|</span>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
     </nav>
 
-    <p>Welcome, {{ username }}!</p>
+    <p class="welcome-line">Welcome, {{ username }}!</p>
     
     <div class="page-shell">
         {% block content %}{% endblock %}

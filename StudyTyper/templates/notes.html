@@ -17,97 +17,62 @@
     {% endif %}
 {% endwith %}
 
-
-
-
-
-
-<div class="page-hero">
-    <div>
-        <h1>Notes Workspace</h1>
-        <p>Capture class notes, build speed, and watch your typing metrics update while you work.</p>
-    </div>
-    <div class="hero-badge">Live Typing Lab</div>
-</div>
-
-<div class="notes-layout">
-    <div class="notes-editor-card">
-        <h2 class="section-title">Focused Notes Editor</h2>
-        <p class="section-subtitle">Use this space to take notes while tracking speed, spelling, and accuracy.</p>
-
+<div class="notes-page">
+    <header class="notes-header">
+        <h1>Notes</h1>
         <div class="notes-toolbar">
-            <button id="startSessionBtn">Start Session</button>
-            <button id="pauseSessionBtn" class="secondary">Pause Session</button>
-            <button>Save Notes</button>
-            <h2 id="typingStatus">Status: </h1>
+            <button type="button" id="startSessionBtn">Start session</button>
+            <button type="button" id="pauseSessionBtn" class="secondary">Pause</button>
+            <button type="button" id="stopSessionBtn" class="secondary">Stop</button>
+            <button type="button" id="saveNotesBtn">Save note</button>
+            <p id="typingStatus" class="notes-status" aria-live="polite"></p>
         </div>
+    </header>
 
-        <textarea id="notesArea" class="notes-area" placeholder="Start typing your notes here..."></textarea>
+    <div class="notes-metrics" aria-live="polite">
+        <span class="notes-metrics-label">WPM</span>
+        <span id="wpmDisplay" class="notes-metrics-value">—</span>
     </div>
 
-    <div class="notes-side-panel">
-        <div class="notes-stat-card">
-            <h3>Typing Metrics</h3>
-            <div class="notes-stat-grid">
-                <div class="metric-box">
-                    <span class="metric-label">WPM</span>
-                    <span id="wpmValue" class="metric-value">54</span>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-label">Accuracy</span>
-                    <span class="metric-value">96%</span>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-label">Errors</span>
-                    <span class="metric-value">3</span>
-                </div>
-                <div class="metric-box">
-                    <span class="metric-label">Time</span>
-                    <span id="timeValue" class="metric-value">12m</span>
-                </div>
-            </div>
+    <textarea id="notesArea" class="notes-area" placeholder="Write your notes here…" rows="18"></textarea>
+
+    <section class="notes-spelling" aria-labelledby="spelling-heading">
+        <h2 id="spelling-heading" class="notes-spelling-title">Spelling</h2>
+        <ul id="spellingErrorsList" class="spelling-list">
+            <li class="spelling-placeholder">Spell check not implemented yet.</li>
+        </ul>
+    </section>
+
+    <div class="notes-files">
+        <form action="{{ url_for('upload_notes') }}" method="POST" enctype="multipart/form-data" class="notes-upload">
+            <label class="notes-upload-label">
+                <span>Open .txt</span>
+                <input type="file" id="notesFileInput" name="notes_file" accept=".txt,text/plain">
+            </label>
+            <button type="submit">Upload copy to server</button>
+        </form>
+        <div class="notes-save-file">
+            <label class="notes-upload-label" for="saveFileNameInput">Filename</label>
+            <input type="text" id="saveFileNameInput" class="notes-filename-input" placeholder="my-notes.txt" autocomplete="off">
+            <button type="button" id="saveFileBtn" class="secondary">Save to server</button>
+            <button type="button" id="downloadNotesBtn" class="secondary">Download to device</button>
         </div>
+        <p class="notes-files-hint">
+            <strong>Save note</strong> stores your text in the app database.
+            <strong>Save to server</strong> writes a .txt in your account folder on this server.
+            <strong>Download to device</strong> saves a .txt on your computer (Downloads).
+            Choosing <strong>Open .txt</strong> loads the file into the editor; <strong>Upload copy to server</strong> also keeps a backup in your server folder.
+        </p>
 
-        <div class="notes-stat-card">
-            <h3>Session Progress</h3>
-            <div class="progress-list">
-                <div class="progress-item">
-                    <strong>Typing Goal</strong>
-                    Reach 60 WPM this week
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 78%;"></div>
-                    </div>
-                </div>
-
-                <div class="progress-item">
-                    <strong>Accuracy Goal</strong>
-                    Stay above 95%
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 96%;"></div>
-                    </div>
-                </div>
+        <section class="notes-my-files" aria-labelledby="my-files-heading">
+            <div class="notes-my-files-head">
+                <h2 id="my-files-heading" class="notes-spelling-title">Your files on this server</h2>
+                <button type="button" id="myFilesRefreshBtn" class="secondary">Refresh list</button>
             </div>
-        </div>
-
-        <div class="notes-stat-card">
-            <h3>Quick Actions</h3>
-
-            <form action="{{ url_for('upload_notes') }}" method="POST" enctype="multipart/form-data"
-                class="upload-form">
-                <input type="file" name="notes_file" accept=".pdf,.txt">
-                <button type="submit">Upload File</button>
-            </form>
-
-            <div class="quick-actions">
-                <button type="button">Generate Notes</button>
-                <button type="button">Spell Check</button>
-                <button type="button">Export</button>
-            </div>
-        </div>
+            <div id="myFilesContainer" class="my-files-container"></div>
+        </section>
     </div>
 </div>
 
-
-<!-- JavaScript connection -->
 <script src="{{ url_for('static', filename='scripts/notes.js') }}"></script>
 {% endblock %}

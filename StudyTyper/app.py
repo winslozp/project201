@@ -1,17 +1,31 @@
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from datetime import datetime
+
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    session,
+    flash,
+    jsonify,
+    current_app,
+    send_file,
+)
 from flask_sqlalchemy import SQLAlchemy
 ## Security Function for password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'dev-secret-key'
 
-UPLOAD_FOLDER = 'uploads'
-ALLOWED_EXTENSIONS = {'txt', 'pdf'}
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+ALLOWED_EXTENSIONS = {'txt'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB size
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -19,7 +33,9 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = (
+    'sqlite:///' + os.path.join(BASE_DIR, 'users.db').replace('\\', '/')
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -32,6 +48,100 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+
+
+class Note(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    title = db.Column(db.String(200), default="", nullable=False)
+    content = db.Column(db.Text, default="", nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class TypingSession(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    note_id = db.Column(db.Integer, db.ForeignKey("note.id"), nullable=True)
+    wpm = db.Column(db.Integer, nullable=True)
+    duration_seconds = db.Column(db.Integer, nullable=True)
+    word_count = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+
+def current_user():
+    if "username" not in session:
+        return None
+    return User.query.filter_by(username=session["username"]).first()
+
+
+def user_upload_dir(user_id):
+    p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'uploads')
+    os.makedirs(p, exist_ok=True)
+    return p
+
+
+def user_saved_dir(user_id):
+    p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'saved')
+    os.makedirs(p, exist_ok=True)
+    return p
+
+
+USER_FILE_FOLDERS = frozenset({"uploads", "saved"})
+
+
+def _safe_user_txt_path(user_id, folder_key, filename):
+    fk = (folder_key or "").strip().lower()
+    if fk not in USER_FILE_FOLDERS:
+        return None
+    name = secure_filename(filename)
+    if not name or name in (".", ".."):
+        return None
+    if not name.lower().endswith(".txt"):
+        return None
+    if fk == "uploads":
+        base = user_upload_dir(user_id)
+    else:
+        base = user_saved_dir(user_id)
+    full = os.path.normpath(os.path.join(base, name))
+    abase = os.path.abspath(base)
+    afull = os.path.abspath(full)
+    try:
+        if os.path.commonpath([afull, abase]) != abase:
+            return None
+    except ValueError:
+        return None
+    return full
+
+
+def _list_txt_files_in_dir(directory):
+    out = []
+    if not os.path.isdir(directory):
+        return out
+    for name in sorted(os.listdir(directory)):
+        if not name.lower().endswith(".txt"):
+            continue
+        path = os.path.join(directory, name)
+        if not os.path.isfile(path):
+            continue
+        try:
+            st = os.stat(path)
+            out.append({"name": name, "size": st.st_size})
+        except OSError:
+            continue
+    return out
+
+
+def _optional_non_negative_int(value):
+    if value is None:
+        return None
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        return None
+    if n < 0:
+        return None
+    return n
 
 
 with app.app_context():
@@ -104,6 +214,146 @@ def notes():
 
 
 # -----------------
+# API — NOTES
+# -----------------
+@app.route("/api/notes", methods=["POST"])
+def api_create_note():
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    title = (data.get("title") or "").strip()
+    content = data.get("content")
+    if content is None:
+        return jsonify({"ok": False, "error": "Missing content"}), 400
+    if not str(content).strip():
+        return jsonify({"ok": False, "error": "Content cannot be empty"}), 400
+
+    note = Note(user_id=user.id, title=title, content=str(content))
+    db.session.add(note)
+    db.session.flush()
+
+    wpm = _optional_non_negative_int(data.get("wpm"))
+    duration_seconds = _optional_non_negative_int(data.get("duration_seconds"))
+    word_count = _optional_non_negative_int(data.get("word_count"))
+    has_metrics = any(v is not None for v in (wpm, duration_seconds, word_count))
+    if has_metrics:
+        typing_session = TypingSession(
+            user_id=user.id,
+            note_id=note.id,
+            wpm=wpm,
+            duration_seconds=duration_seconds,
+            word_count=word_count,
+        )
+        db.session.add(typing_session)
+
+    db.session.commit()
+
+    return jsonify(
+        {
+            "ok": True,
+            "note_id": note.id,
+            "message": "Note saved",
+        }
+    ), 201
+
+
+@app.route("/api/save-text-file", methods=["POST"])
+def api_save_text_file():
+    """Write textarea content to a .txt file under the current user's saved folder only."""
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    content = data.get("content")
+    if content is None:
+        content = ""
+    if not isinstance(content, str):
+        return jsonify({"ok": False, "error": "Invalid content"}), 400
+
+    raw_name = (data.get("filename") or "").strip()
+    if not raw_name:
+        raw_name = datetime.utcnow().strftime("notes-%Y%m%d-%H%M%S.txt")
+
+    filename = secure_filename(raw_name)
+    if not filename or filename in (".", ".."):
+        filename = datetime.utcnow().strftime("notes-%Y%m%d-%H%M%S.txt")
+    if not filename.lower().endswith(".txt"):
+        filename = f"{filename}.txt"
+        filename = secure_filename(filename)
+
+    save_dir = user_saved_dir(user.id)
+    save_path = os.path.join(save_dir, filename)
+
+    try:
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(content)
+    except OSError:
+        return jsonify({"ok": False, "error": "Could not write file"}), 500
+
+    return (
+        jsonify(
+            {
+                "ok": True,
+                "filename": filename,
+                "message": "File saved to your folder",
+            }
+        ),
+        201,
+    )
+
+
+@app.route("/api/my-files", methods=["GET"])
+def api_my_files():
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+    return jsonify(
+        {
+            "ok": True,
+            "uploads": _list_txt_files_in_dir(user_upload_dir(user.id)),
+            "saved": _list_txt_files_in_dir(user_saved_dir(user.id)),
+        }
+    )
+
+
+@app.route("/api/my-files/content/<folder>/<filename>", methods=["GET"])
+def api_my_files_content(folder, filename):
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+    path = _safe_user_txt_path(user.id, folder, filename)
+    if not path or not os.path.isfile(path):
+        return jsonify({"ok": False, "error": "Not found"}), 404
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            text = f.read()
+    except OSError:
+        return jsonify({"ok": False, "error": "Could not read file"}), 500
+    return jsonify(
+        {"ok": True, "content": text, "name": os.path.basename(path), "folder": folder}
+    )
+
+
+@app.route("/api/my-files/download/<folder>/<filename>", methods=["GET"])
+def api_my_files_download(folder, filename):
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+    path = _safe_user_txt_path(user.id, folder, filename)
+    if not path or not os.path.isfile(path):
+        return jsonify({"ok": False, "error": "Not found"}), 404
+    return send_file(
+        path,
+        as_attachment=True,
+        download_name=os.path.basename(path),
+        mimetype="text/plain",
+    )
+
+
+# -----------------
 # FLASHCARDS PAGE
 # -----------------
 @app.route('/flashcards', methods=['GET', 'POST'])
@@ -151,6 +401,15 @@ def allowed_file(filename):
 
 @app.route('/upload_notes', methods=['POST'])
 def upload_notes():
+    if 'username' not in session:
+        flash('Please log in to upload files.')
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    if not user:
+        session.pop('username', None)
+        return redirect(url_for('login'))
+
     if 'notes_file' not in request.files:
         flash('No file part found.')
         return redirect(url_for('notes'))
@@ -162,14 +421,15 @@ def upload_notes():
         return redirect(url_for('notes'))
 
     if not allowed_file(file.filename):
-        flash('Invalid file type. Only PDF and TXT files are allowed.')
+        flash('Invalid file type. Only .txt files are allowed.')
         return redirect(url_for('notes'))
 
     filename = secure_filename(file.filename)
-    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    save_dir = user_upload_dir(user.id)
+    save_path = os.path.join(save_dir, filename)
     file.save(save_path)
 
-    flash(f'File "{filename}" uploaded successfully.')
+    flash(f'File "{filename}" saved to your uploads folder.')
     return redirect(url_for('notes'))
 
 

@@ -1,17 +1,34 @@
-console.log("Running");
-
-//Notes.js - Handles the note-taking session logic, including timing, WPM calculation, and session control.
+// Live WPM from word count ÷ active typing time; idle (2s) pauses the timer; Stop shows final average.
 document.addEventListener("DOMContentLoaded", () => {
     const notesArea = document.getElementById("notesArea");
     const startSessionBtn = document.getElementById("startSessionBtn");
     const pauseSessionBtn = document.getElementById("pauseSessionBtn");
+    const stopSessionBtn = document.getElementById("stopSessionBtn");
     const typingStatus = document.getElementById("typingStatus");
-    const timeValue = document.getElementById("timeValue");
-    const wpmValue = document.getElementById("wpmValue");
+    const saveNotesBtn = document.getElementById("saveNotesBtn");
+    const saveFileBtn = document.getElementById("saveFileBtn");
+    const saveFileNameInput = document.getElementById("saveFileNameInput");
+    const downloadNotesBtn = document.getElementById("downloadNotesBtn");
+    const notesFileInput = document.getElementById("notesFileInput");
+    const wpmDisplay = document.getElementById("wpmDisplay");
 
-    if (!notesArea || !startSessionBtn || !pauseSessionBtn || !typingStatus || !timeValue || !wpmValue) {
+    if (
+        !notesArea ||
+        !startSessionBtn ||
+        !pauseSessionBtn ||
+        !stopSessionBtn ||
+        !typingStatus ||
+        !saveNotesBtn ||
+        !saveFileBtn ||
+        !saveFileNameInput ||
+        !downloadNotesBtn ||
+        !notesFileInput ||
+        !wpmDisplay
+    ) {
         return;
     }
+
+    let refreshMyFilesList = () => {};
 
     let sessionStarted = false;
     let manuallyPaused = false;
@@ -19,61 +36,100 @@ document.addEventListener("DOMContentLoaded", () => {
     let activeSeconds = 0;
     let idleTimeout = null;
 
-    // 2 seconds
     const IDLE_DELAY = 2000;
- 
-    // Utility function to count words in the text area
+
     function getWordCount(text) {
         const trimmed = text.trim();
         if (trimmed === "") return 0;
         return trimmed.split(/\s+/).length;
     }
 
-
-    // Update the time and WPM display
-    function updateMetrics() {
-        const wordCount = getWordCount(notesArea.value);
-
-        timeValue.textContent = `${activeSeconds}s`;
-
-        if (activeSeconds > 0) {
-            const minutes = activeSeconds / 60;
-            const wpm = Math.round(wordCount / minutes);
-            wpmValue.textContent = isFinite(wpm) ? wpm : 0;
-        } else {
-            wpmValue.textContent = "0";
-        }
+    function computeWpm(wordCount, seconds) {
+        if (seconds <= 0) return 0;
+        const minutes = seconds / 60;
+        const wpm = Math.round(wordCount / minutes);
+        return isFinite(wpm) ? wpm : 0;
     }
 
-
-    // Update the typing status display
     function setStatus(text) {
-        typingStatus.textContent = `Status: ${text}`;
+        typingStatus.textContent = text;
     }
 
+    function resolveTxtFilename() {
+        let name = saveFileNameInput.value.trim();
+        if (!name) {
+            name = "notes.txt";
+        } else if (!name.toLowerCase().endsWith(".txt")) {
+            name = `${name}.txt`;
+        }
+        return name;
+    }
 
-    // Event listeners for session control and typing activity
+    function downloadTextAsFile(filename, text) {
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    }
+
+    function syncWpmDisplay() {
+        if (!sessionStarted) {
+            return;
+        }
+        const wc = getWordCount(notesArea.value);
+        wpmDisplay.textContent = String(computeWpm(wc, activeSeconds));
+    }
+
     startSessionBtn.addEventListener("click", () => {
+        activeSeconds = 0;
         sessionStarted = true;
         manuallyPaused = false;
         activelyTyping = false;
-        setStatus("Waiting for typing...");
+        pauseSessionBtn.textContent = "Pause";
+        clearTimeout(idleTimeout);
+        setStatus("Session started — type to begin");
+        wpmDisplay.textContent = "0";
         notesArea.focus();
     });
 
-
-    // Pause the session and stop tracking time until the user starts typing again
     pauseSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
-        manuallyPaused = true;
-        activelyTyping = false;
-        clearTimeout(idleTimeout);
-        setStatus("Paused");
+        manuallyPaused = !manuallyPaused;
+        if (manuallyPaused) {
+            activelyTyping = false;
+            clearTimeout(idleTimeout);
+            pauseSessionBtn.textContent = "Resume";
+            setStatus("Paused");
+            syncWpmDisplay();
+        } else {
+            pauseSessionBtn.textContent = "Pause";
+            setStatus("Resumed — type to continue");
+        }
     });
 
+    stopSessionBtn.addEventListener("click", () => {
+        if (!sessionStarted) return;
 
-    // Detect typing activity and manage idle state
+        const wc = getWordCount(notesArea.value);
+        const finalWpm = computeWpm(wc, activeSeconds);
+
+        sessionStarted = false;
+        manuallyPaused = false;
+        activelyTyping = false;
+        clearTimeout(idleTimeout);
+        pauseSessionBtn.textContent = "Pause";
+
+        wpmDisplay.textContent = String(finalWpm);
+        setStatus(`Session stopped — average ${finalWpm} WPM (${activeSeconds}s active)`);
+    });
+
     notesArea.addEventListener("input", () => {
         if (!sessionStarted || manuallyPaused) return;
 
@@ -84,17 +140,254 @@ document.addEventListener("DOMContentLoaded", () => {
         idleTimeout = setTimeout(() => {
             activelyTyping = false;
             if (!manuallyPaused && sessionStarted) {
-                setStatus("Idle / Timer Paused");
+                setStatus("Idle — timer paused");
             }
+            syncWpmDisplay();
         }, IDLE_DELAY);
 
-        updateMetrics();
+        syncWpmDisplay();
     });
 
     setInterval(() => {
         if (sessionStarted && !manuallyPaused && activelyTyping) {
             activeSeconds++;
-            updateMetrics();
+            syncWpmDisplay();
         }
     }, 1000);
+
+    saveNotesBtn.addEventListener("click", async () => {
+        const content = notesArea.value;
+        if (!content.trim()) {
+            setStatus("Nothing to save — add some notes first.");
+            return;
+        }
+
+        const firstLine = content.trim().split("\n")[0];
+        const title = firstLine.length > 80 ? `${firstLine.slice(0, 77)}...` : firstLine;
+
+        const wc = getWordCount(content);
+        const payload = {
+            title,
+            content,
+            wpm: computeWpm(wc, activeSeconds),
+            duration_seconds: activeSeconds,
+            word_count: wc,
+        };
+
+        saveNotesBtn.disabled = true;
+        setStatus("Saving...");
+
+        try {
+            const res = await fetch("/api/notes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && data.ok) {
+                setStatus(`Saved (note #${data.note_id})`);
+            } else if (res.status === 401) {
+                setStatus("Not logged in — refresh and sign in again.");
+            } else {
+                setStatus(data.error || "Save failed.");
+            }
+        } catch (e) {
+            setStatus("Save failed — check your connection.");
+        } finally {
+            saveNotesBtn.disabled = false;
+        }
+    });
+
+    saveFileBtn.addEventListener("click", async () => {
+        const content = notesArea.value;
+        let filename = saveFileNameInput.value.trim();
+        if (filename && !filename.toLowerCase().endsWith(".txt")) {
+            filename = `${filename}.txt`;
+        }
+
+        saveFileBtn.disabled = true;
+        setStatus("Saving to server…");
+
+        try {
+            const res = await fetch("/api/save-text-file", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({ content, filename: filename || undefined }),
+            });
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && data.ok) {
+                setStatus(`Saved on server: ${data.filename}`);
+            } else if (res.status === 401) {
+                setStatus("Not logged in — refresh and sign in again.");
+            } else {
+                setStatus(data.error || "Could not save file.");
+            }
+        } catch (e) {
+            setStatus("Save to server failed — check your connection.");
+        } finally {
+            saveFileBtn.disabled = false;
+        }
+    });
+
+    downloadNotesBtn.addEventListener("click", () => {
+        const filename = resolveTxtFilename();
+        downloadTextAsFile(filename, notesArea.value);
+        setStatus(`Downloaded “${filename}” to your device`);
+    });
+
+    notesFileInput.addEventListener("change", () => {
+        const file = notesFileInput.files && notesFileInput.files[0];
+        if (!file) {
+            return;
+        }
+
+        if (!file.name.toLowerCase().endsWith(".txt")) {
+            setStatus("Only .txt files can be loaded into the editor.");
+            notesFileInput.value = "";
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const text = typeof reader.result === "string" ? reader.result : "";
+            const existing = notesArea.value.trim();
+            if (existing) {
+                if (!window.confirm("Replace current notes with this file?")) {
+                    notesFileInput.value = "";
+                    return;
+                }
+            }
+            notesArea.value = text;
+            setStatus(`Loaded “${file.name}” — keep editing, then Save note / Save to server / Download.`);
+            notesFileInput.value = "";
+        };
+        reader.onerror = () => {
+            setStatus("Could not read that file.");
+            notesFileInput.value = "";
+        };
+        reader.readAsText(file);
+    });
+
+    const myFilesContainer = document.getElementById("myFilesContainer");
+    const myFilesRefreshBtn = document.getElementById("myFilesRefreshBtn");
+    if (myFilesContainer && myFilesRefreshBtn) {
+        function formatBytes(n) {
+            if (n < 1024) {
+                return `${n} B`;
+            }
+            if (n < 1024 * 1024) {
+                return `${(n / 1024).toFixed(1)} KB`;
+            }
+            return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+        }
+
+        function contentUrl(folder, name) {
+            return `/api/my-files/content/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`;
+        }
+
+        function downloadUrl(folder, name) {
+            return `/api/my-files/download/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`;
+        }
+
+        async function loadMyFiles() {
+            myFilesContainer.innerHTML = '<p class="my-files-loading">Loading…</p>';
+            try {
+                const res = await fetch("/api/my-files", { credentials: "same-origin" });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.ok) {
+                    myFilesContainer.innerHTML =
+                        '<p class="my-files-error">Could not load your file list.</p>';
+                    return;
+                }
+                myFilesContainer.innerHTML = "";
+                const up = data.uploads || [];
+                const sv = data.saved || [];
+                const hasAny = up.length > 0 || sv.length > 0;
+                if (!hasAny) {
+                    myFilesContainer.innerHTML =
+                        '<p class="my-files-empty">No .txt files saved yet.</p>';
+                    return;
+                }
+
+                function renderGroup(title, items, folderKey) {
+                    if (!items.length) {
+                        return;
+                    }
+                    const h = document.createElement("h3");
+                    h.className = "my-files-group-title";
+                    h.textContent = title;
+                    myFilesContainer.appendChild(h);
+                    const ul = document.createElement("ul");
+                    ul.className = "my-files-list";
+                    items.forEach((item) => {
+                        const li = document.createElement("li");
+                        li.className = "my-files-item";
+                        const meta = document.createElement("span");
+                        meta.className = "my-files-meta";
+                        meta.textContent = `${item.name} · ${formatBytes(item.size)}`;
+                        const openBtn = document.createElement("button");
+                        openBtn.type = "button";
+                        openBtn.className = "secondary";
+                        openBtn.textContent = "Open";
+                        openBtn.dataset.folder = folderKey;
+                        openBtn.dataset.file = item.name;
+                        const a = document.createElement("a");
+                        a.href = downloadUrl(folderKey, item.name);
+                        a.className = "my-file-dl";
+                        a.textContent = "Download";
+                        a.setAttribute("download", "");
+                        li.appendChild(meta);
+                        li.appendChild(openBtn);
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    });
+                    myFilesContainer.appendChild(ul);
+                }
+
+                renderGroup("Uploads (upload copy to server)", up, "uploads");
+                renderGroup("Saved (Save to server)", sv, "saved");
+            } catch (e) {
+                myFilesContainer.innerHTML =
+                    '<p class="my-files-error">Could not load your file list.</p>';
+            }
+        }
+
+        myFilesContainer.addEventListener("click", async (e) => {
+            const btn = e.target.closest("button[data-folder][data-file]");
+            if (!btn) {
+                return;
+            }
+            const folder = btn.dataset.folder;
+            const name = btn.dataset.file;
+            if (!folder || !name) {
+                return;
+            }
+            const existing = notesArea.value.trim();
+            if (existing) {
+                if (!window.confirm("Replace current notes with this file?")) {
+                    return;
+                }
+            }
+            try {
+                const res = await fetch(contentUrl(folder, name), { credentials: "same-origin" });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.ok) {
+                    setStatus("Could not open that file.");
+                    return;
+                }
+                notesArea.value = data.content;
+                setStatus(`Opened “${data.name}” from ${folder}.`);
+            } catch (err) {
+                setStatus("Could not open that file.");
+            }
+        });
+
+        myFilesRefreshBtn.addEventListener("click", loadMyFiles);
+        refreshMyFilesList = loadMyFiles;
+        loadMyFiles();
+    }
 });

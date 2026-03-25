@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <h1>Welcome to Study Typer!</h1>
         <link rel="stylesheet" href="{{ url_for('static', filename='styles/loginStyles.css') }}">
     </head>
     <body>
-    <h2>Login</h2>
+        <img src="{{ url_for('static', filename='Logos/StudyTyperLogo1.png') }}" alt="Study Typer Logo" id="logo">
+        <h1>Welcome to Study Typer!</h1>
+        <h2>Login</h2>
 
-<form method="POST">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
 
-<p>{{ message }}</p>
+        <p>{{ message }}</p>
 
-<a href="/register">Create account</a>
+        <a href="/register">Create account</a>
     </body>
 </html>
