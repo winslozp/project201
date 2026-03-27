@@ -1,0 +1,7 @@
+This is a new user that can type their own notes:
+
+-Sometimes the notes will need to be in bullet points
+- Sometimes the notes will not
+
+Sometimes the notes will be in a  big file
+Sometimes they will be in a small file.
