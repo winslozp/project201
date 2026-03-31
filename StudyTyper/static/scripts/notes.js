@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadNotesBtn = document.getElementById("downloadNotesBtn");
     const notesFileInput = document.getElementById("notesFileInput");
     const wpmDisplay = document.getElementById("wpmDisplay");
+    // Generate Summary
+    const generateSummaryBtn = document.getElementById("generateSummaryBtn");
+    const summaryOutput = document.getElementById("summaryOutput");
 
     if (
         !notesArea ||
@@ -23,12 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
         !saveFileNameInput ||
         !downloadNotesBtn ||
         !notesFileInput ||
-        !wpmDisplay
+        !wpmDisplay ||
+        !generateSummaryBtn ||
+        !summaryOutput
     ) {
         return;
     }
 
-    let refreshMyFilesList = () => {};
+    let refreshMyFilesList = () => { };
 
     let sessionStarted = false;
     let manuallyPaused = false;
@@ -237,6 +242,48 @@ document.addEventListener("DOMContentLoaded", () => {
         const filename = resolveTxtFilename();
         downloadTextAsFile(filename, notesArea.value);
         setStatus(`Downloaded “${filename}” to your device`);
+    });
+
+    // Summary Button
+    generateSummaryBtn.addEventListener("click", async () => {
+        const content = notesArea.value;
+
+        if (!content.trim()) {
+            setStatus("Nothing to summarize — add some notes first.");
+            summaryOutput.value = "";
+            return;
+        }
+
+        generateSummaryBtn.disabled = true;
+        summaryOutput.value = "Generating summary...";
+        setStatus("Generating summary...");
+
+        try {
+            const res = await fetch("/api/summarize", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "same-origin",
+                body: JSON.stringify({ content }),
+            });
+
+            const data = await res.json().catch(() => ({}));
+
+            if (res.ok && data.ok) {
+                summaryOutput.value = data.summary || "";
+                setStatus("Summary generated.");
+            } else if (res.status === 401) {
+                summaryOutput.value = "";
+                setStatus("Not logged in — refresh and sign in again.");
+            } else {
+                summaryOutput.value = "";
+                setStatus(data.error || "Summary failed.");
+            }
+        } catch (e) {
+            summaryOutput.value = "";
+            setStatus("Summary failed — check your connection.");
+        } finally {
+            generateSummaryBtn.disabled = false;
+        }
     });
 
     notesFileInput.addEventListener("change", () => {

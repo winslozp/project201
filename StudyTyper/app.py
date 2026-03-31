@@ -17,6 +17,9 @@ from flask_sqlalchemy import SQLAlchemy
 ## Security Function for password hashing and verification
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+## Ollama for local Ai/note summary
+import ollama
+
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -436,5 +439,53 @@ def upload_notes():
 
 
 
+# -----------------
+# NOTE SUMMARIZING WITH LOCAL AI
+# -----------------
+def generate_summary_with_ollama(text):
+    try:
+        client = ollama.Client()
+
+        response = client.generate(
+            model="llama3.2:1b",  # or whatever model you installed
+            prompt=f"""
+            You are a helpful study assistant.
+
+            Summarize the following notes into:
+            - A short paragraph summary
+            - 5 bullet point key ideas
+
+            Notes:
+            {text}
+            """
+        )
+
+        return response["response"]
+
+    except Exception as e:
+        print("Ollama error:", e)
+        return "Error generating summary."
+
+
+@app.route("/api/summarize", methods=["POST"])
+def api_summarize():
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+
+    data = request.get_json()
+    text = data.get("content", "")
+
+    if not text.strip():
+        return jsonify({"ok": False, "error": "No content provided"}), 400
+
+    summary = generate_summary_with_ollama(text)
+
+    return jsonify({
+        "ok": True,
+        "summary": summary
+    })
+
+## Keep at bottom
 if __name__ == "__main__":
     app.run(debug=True)

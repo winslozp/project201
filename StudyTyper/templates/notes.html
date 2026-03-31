@@ -8,13 +8,13 @@
 
 {% block content %}
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        <div class="flash-messages">
-            {% for message in messages %}
-                <div class="flash-message">{{ message }}</div>
-            {% endfor %}
-        </div>
-    {% endif %}
+{% if messages %}
+<div class="flash-messages">
+    {% for message in messages %}
+    <div class="flash-message">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
 {% endwith %}
 
 <div class="notes-page">
@@ -43,6 +43,12 @@
         </ul>
     </section>
 
+    <div class="notes-summary">
+        <button type="button" id="generateSummaryBtn">Generate Summary</button>
+        <textarea id="summaryOutput" class="notes-summary-output" placeholder="Your summary will appear here..."
+            rows="10" readonly></textarea>
+    </div>
+
     <div class="notes-files">
         <form action="{{ url_for('upload_notes') }}" method="POST" enctype="multipart/form-data" class="notes-upload">
             <label class="notes-upload-label">
@@ -53,7 +59,8 @@
         </form>
         <div class="notes-save-file">
             <label class="notes-upload-label" for="saveFileNameInput">Filename</label>
-            <input type="text" id="saveFileNameInput" class="notes-filename-input" placeholder="my-notes.txt" autocomplete="off">
+            <input type="text" id="saveFileNameInput" class="notes-filename-input" placeholder="my-notes.txt"
+                autocomplete="off">
             <button type="button" id="saveFileBtn" class="secondary">Save to server</button>
             <button type="button" id="downloadNotesBtn" class="secondary">Download to device</button>
         </div>
@@ -61,7 +68,8 @@
             <strong>Save note</strong> stores your text in the app database.
             <strong>Save to server</strong> writes a .txt in your account folder on this server.
             <strong>Download to device</strong> saves a .txt on your computer (Downloads).
-            Choosing <strong>Open .txt</strong> loads the file into the editor; <strong>Upload copy to server</strong> also keeps a backup in your server folder.
+            Choosing <strong>Open .txt</strong> loads the file into the editor; <strong>Upload copy to server</strong>
+            also keeps a backup in your server folder.
         </p>
 
         <section class="notes-my-files" aria-labelledby="my-files-heading">
