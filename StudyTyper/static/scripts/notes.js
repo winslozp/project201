@@ -91,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
         wpmDisplay.textContent = String(computeWpm(wc, activeSeconds));
     }
 
+    // Event Listeners
     startSessionBtn.addEventListener("click", () => {
         activeSeconds = 0;
         sessionStarted = true;
@@ -103,6 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
         notesArea.focus();
     });
 
+
+    // Toggle pause/resume on button click; also pause on idle (2s no typing) and resume on input.
     pauseSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
@@ -119,6 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Stop session, show final WPM, and reset all timers/status.
     stopSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
@@ -135,6 +139,8 @@ document.addEventListener("DOMContentLoaded", () => {
         setStatus(`Session stopped — average ${finalWpm} WPM (${activeSeconds}s active)`);
     });
 
+
+    // On input, if session is active and not manually paused, mark as actively typing and reset idle timer; on idle, mark as not actively typing and pause timer.
     notesArea.addEventListener("input", () => {
         if (!sessionStarted || manuallyPaused) return;
 
@@ -160,6 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 1000);
 
+
+    // Save note to server with title (first line or truncated), content, word count, duration, and computed WPM; handle UI states and errors.
     saveNotesBtn.addEventListener("click", async () => {
         const content = notesArea.value;
         if (!content.trim()) {
@@ -205,6 +213,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+
+    // Save note as .txt file on server with optional filename; handle UI states and errors.
     saveFileBtn.addEventListener("click", async () => {
         const content = notesArea.value;
         let filename = saveFileNameInput.value.trim();
@@ -238,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {
         const filename = resolveTxtFilename();
         downloadTextAsFile(filename, notesArea.value);
@@ -286,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Load .txt file from device into editor, replacing current content; handle UI states and errors.
     notesFileInput.addEventListener("change", () => {
         const file = notesFileInput.files && notesFileInput.files[0];
         if (!file) {
