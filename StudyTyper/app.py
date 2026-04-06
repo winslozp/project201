@@ -21,7 +21,7 @@ from werkzeug.utils import secure_filename
 import ollama
 
 
-
+## Basic Flask app setup, database models, and utility functions for file handling and user sessions.
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
@@ -447,7 +447,7 @@ def generate_summary_with_ollama(text):
         client = ollama.Client()
 
         response = client.generate(
-            model="llama3.2:1b",  # or whatever model you installed
+            model="llama3.2:1b", 
             prompt=f"""
             You are a helpful study assistant.
 
