@@ -1,4 +1,6 @@
 import os
+import json
+import re
 from datetime import datetime
 
 from flask import (
@@ -18,7 +20,10 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 ## Ollama for local Ai/note summary
-import ollama
+try:
+    import ollama
+except ImportError:
+    ollama = None
 
 
 ## Basic Flask app setup, database models, and utility functions for file handling and user sessions.
@@ -145,6 +150,69 @@ def _optional_non_negative_int(value):
     if n < 0:
         return None
     return n
+
+
+def _ensure_ollama_available():
+    if ollama is None:
+        raise RuntimeError("The Python 'ollama' package is not installed.")
+
+
+def _generate_with_ollama(prompt, model="llama3.2:1b"):
+    _ensure_ollama_available()
+    client = ollama.Client()
+    response = client.generate(model=model, prompt=prompt)
+    text = (response.get("response") or "").strip()
+    if not text:
+        raise RuntimeError("Ollama returned an empty response.")
+    return text
+
+
+def _extract_json_payload(text):
+    fenced_match = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    candidates = []
+    if fenced_match:
+        candidates.append(fenced_match.group(1).strip())
+
+    first_object = text.find("{")
+    last_object = text.rfind("}")
+    if first_object != -1 and last_object != -1 and last_object > first_object:
+        candidates.append(text[first_object:last_object + 1])
+
+    first_array = text.find("[")
+    last_array = text.rfind("]")
+    if first_array != -1 and last_array != -1 and last_array > first_array:
+        candidates.append(text[first_array:last_array + 1])
+
+    candidates.append(text.strip())
+
+    for candidate in candidates:
+        try:
+            return json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+
+    raise ValueError("Could not parse JSON from the Ollama response.")
+
+
+def _normalize_flashcards(payload):
+    cards = payload.get("flashcards") if isinstance(payload, dict) else payload
+    if not isinstance(cards, list):
+        raise ValueError("Flashcards response did not contain a flashcards list.")
+
+    cleaned = []
+    for item in cards:
+        if not isinstance(item, dict):
+            continue
+        term = str(item.get("term", "")).strip()
+        definition = str(item.get("definition", "")).strip()
+        if not term or not definition:
+            continue
+        cleaned.append({"term": term, "definition": definition})
+
+    if not cleaned:
+        raise ValueError("No usable flashcards were returned.")
+
+    return cleaned
 
 
 with app.app_context():
@@ -359,18 +427,10 @@ def api_my_files_download(folder, filename):
 # -----------------
 # FLASHCARDS PAGE
 # -----------------
-@app.route('/flashcards', methods=['GET', 'POST'])
+@app.route('/flashcards', methods=['GET'])
 def flashcards():
     if 'username' not in session:
         return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        term = request.form.get('term')
-        definition = request.form.get('definition')
-
-        # For now this just prints to terminal
-        # Implement saving flashcards in db later
-        print("Flashcard added:", term, definition)
 
     return render_template("flashcards.html", username=session['username'])
 
@@ -444,10 +504,7 @@ def upload_notes():
 # -----------------
 def generate_summary_with_ollama(text):
     try:
-        client = ollama.Client()
-
-        response = client.generate(
-            model="llama3.2:1b", 
+        return _generate_with_ollama(
             prompt=f"""
             You are a helpful study assistant.
 
@@ -457,14 +514,35 @@ def generate_summary_with_ollama(text):
 
             Notes:
             {text}
-            """
+            """,
         )
-
-        return response["response"]
-
     except Exception as e:
         print("Ollama error:", e)
         return "Error generating summary."
+
+
+def generate_flashcards_with_ollama(text):
+    prompt = f"""
+    You are a helpful study assistant.
+
+    Convert the notes below into 6 to 10 study flashcards.
+    Focus on important concepts, vocabulary, definitions, processes, and cause/effect relationships.
+    Keep each term concise and each definition to 1 or 2 sentences.
+
+    Return JSON only in this exact shape:
+    {{
+      "flashcards": [
+        {{"term": "Term here", "definition": "Definition here"}}
+      ]
+    }}
+
+    Notes:
+    {text}
+    """
+
+    raw_response = _generate_with_ollama(prompt)
+    payload = _extract_json_payload(raw_response)
+    return _normalize_flashcards(payload)
 
 
 @app.route("/api/summarize", methods=["POST"])
@@ -485,6 +563,35 @@ def api_summarize():
         "ok": True,
         "summary": summary
     })
+
+
+@app.route("/api/flashcards", methods=["POST"])
+def api_flashcards():
+    user = current_user()
+    if not user:
+        return jsonify({"ok": False, "error": "Unauthorized"}), 401
+
+    data = request.get_json(silent=True) or {}
+    text = str(data.get("content", ""))
+
+    if not text.strip():
+        return jsonify({"ok": False, "error": "No content provided"}), 400
+
+    try:
+        flashcards = generate_flashcards_with_ollama(text)
+    except Exception as e:
+        print("Ollama flashcard error:", e)
+        return (
+            jsonify(
+                {
+                    "ok": False,
+                    "error": "Could not generate flashcards. Make sure Ollama is installed, running, and the model is available.",
+                }
+            ),
+            500,
+        )
+
+    return jsonify({"ok": True, "flashcards": flashcards})
 
 ## Keep at bottom
 if __name__ == "__main__":

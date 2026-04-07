@@ -106,6 +106,41 @@
     font-style: italic;
 }
 
+.notes-summary {
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.notes-summary button {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.875rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.notes-summary button:hover {
+    background: #f8fafc;
+}
+
+.notes-summary-output {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    resize: vertical;
+    font-family: inherit;
+}
+
 .notes-area {
     width: 100%;
     min-height: 320px;

@@ -7,72 +7,99 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-hero">
-    <div>
-        <h1>Flashcards Studio</h1>
-        <p>Create clean study decks from your notes and practice definitions with a more interactive layout.</p>
-    </div>
-    <div class="hero-badge">Memory Mode</div>
-</div>
-
 <div class="flashcards-layout">
-    <div class="flashcard-form-card">
-        <h2 class="section-title">Build a New Flashcard</h2>
-        <p class="section-subtitle">Add a term and definition to grow your study deck.</p>
-
-        <form method="POST" class="flashcard-form">
+    <section class="flashcards-panel flashcards-generator-panel">
+        <div class="flashcards-hero">
             <div>
-                <label for="term">Term</label>
-                <input type="text" id="term" name="term" placeholder="Example: Agile Development" required>
+                <h1>Flashcards Studio</h1>
+                <p>Select a `.txt` file from your saved server notes and turn it into study cards with Ollama.</p>
             </div>
+            <span class="hero-badge">Saved Notes</span>
+        </div>
 
-            <div>
-                <label for="definition">Definition</label>
-                <textarea id="definition" name="definition" rows="6" placeholder="Write the definition here..."></textarea>
+        <div class="flashcards-controls">
+            <div class="flashcards-select-group">
+                <label for="savedFileSelect">Saved file</label>
+                <select id="savedFileSelect">
+                    <option value="">Choose a saved file…</option>
+                </select>
             </div>
-
-            <button type="submit">Add Flashcard</button>
-        </form>
-
-        <div class="flashcard-stack-preview">
-            <div class="mini-card">
-                <h4>Database</h4>
-                <p class="muted">An organized collection of data that can be accessed and managed.</p>
-            </div>
-
-            <div class="mini-card">
-                <h4>Scrum</h4>
-                <p class="muted">An agile framework used to manage complex product development.</p>
+            <div class="flashcards-actions">
+                <button type="button" id="refreshSavedFilesBtn" class="secondary">Refresh</button>
+                <button type="button" id="generateFlashcardsBtn">Generate Flashcards</button>
             </div>
         </div>
-    </div>
 
-    <div class="study-card-panel">
-        <h2 class="section-title">Study Preview</h2>
-        <p class="section-subtitle">Example of what one active flashcard could look like.</p>
+        <p id="flashcardsStatus" class="flashcards-status" aria-live="polite"></p>
 
-        <div class="flashcard-big">
-            <span class="flashcard-tag">Current Card</span>
+        <div class="source-preview-card">
+            <div class="source-preview-head">
+                <h2 class="section-title">Selected Notes</h2>
+                <span id="selectedFileMeta" class="file-meta">No file selected</span>
+            </div>
+            <pre id="sourcePreview" class="source-preview">Choose a saved file to preview its contents here.</pre>
+        </div>
+    </section>
 
+    <section class="flashcards-panel study-results-panel">
+        <div class="results-head">
             <div>
-                <div class="flashcard-term">Polymorphism</div>
-                <div class="flashcard-definition">
-                    The ability for objects of different classes to be treated through the same interface, often using overridden methods.
-                </div>
+                <h2 class="section-title">Generated Deck</h2>
+                <p class="section-subtitle">Study one card at a time, flip it like Quizlet, and edit any card that needs cleanup.</p>
+            </div>
+            <span id="deckCount" class="deck-count">0 cards</span>
+        </div>
+
+        <section class="study-mode-card" aria-labelledby="study-mode-heading">
+            <div class="study-mode-head">
+                <h3 id="study-mode-heading" class="section-title">Study Mode</h3>
+                <span id="studyPosition" class="file-meta">No cards loaded</span>
             </div>
 
-            <div>
-                <div class="study-actions">
-                    <button>Flip Card</button>
-                    <button class="alt">Type Definition</button>
-                </div>
+            <button type="button" id="studyCardBtn" class="study-card" disabled>
+                <span id="studyCardFaceLabel" class="study-card-face-label">Front</span>
+                <span id="studyCardPrompt" class="study-card-prompt">Generate a deck to start studying.</span>
+                <span id="studyCardContent" class="study-card-content">Your selected flashcard will appear here.</span>
+            </button>
 
-                <div class="study-stats">
-                    <span class="stat-pill">Deck Size: 24</span>
-                    <span class="stat-pill">Mastered: 11</span>
-                </div>
+            <div class="study-controls">
+                <button type="button" id="prevCardBtn" class="secondary" disabled>Previous</button>
+                <button type="button" id="flipCardBtn" disabled>Flip</button>
+                <button type="button" id="expandCardBtn" class="secondary" disabled>Fullscreen</button>
+                <button type="button" id="nextCardBtn" class="secondary" disabled>Next</button>
             </div>
+        </section>
+
+        <div id="flashcardsOutput" class="flashcards-output">
+            <p class="flashcards-placeholder">Your generated flashcards will appear here after you select a saved file.</p>
+        </div>
+    </section>
+</div>
+
+<div id="studyOverlay" class="study-overlay" hidden>
+    <div class="study-overlay-backdrop" data-close-overlay="true"></div>
+    <div class="study-overlay-panel" role="dialog" aria-modal="true" aria-labelledby="overlayStudyTitle">
+        <div class="study-overlay-head">
+            <div>
+                <h2 id="overlayStudyTitle" class="section-title">Fullscreen Study</h2>
+                <p id="overlayStudyPosition" class="section-subtitle">No cards loaded</p>
+            </div>
+            <button type="button" id="closeOverlayBtn" class="secondary">Close</button>
+        </div>
+
+        <button type="button" id="overlayStudyCardBtn" class="study-card study-card-overlay" disabled>
+            <span id="overlayStudyCardFaceLabel" class="study-card-face-label">Front</span>
+            <span id="overlayStudyCardPrompt" class="study-card-prompt">Term</span>
+            <span id="overlayStudyCardContent" class="study-card-content">Your selected flashcard will appear here.</span>
+        </button>
+
+        <div class="study-controls study-controls-overlay">
+            <button type="button" id="overlayPrevCardBtn" class="secondary" disabled>Previous</button>
+            <button type="button" id="overlayFlipCardBtn" disabled>Flip</button>
+            <button type="button" id="overlayNextCardBtn" class="secondary" disabled>Next</button>
         </div>
     </div>
 </div>
+
+<script src="{{ url_for('static', filename='scripts/flashcards.js') }}"></script>
 {% endblock %}

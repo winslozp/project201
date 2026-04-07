@@ -1,0 +1,176 @@
+Notes about Fall 2026 registration for CSE/CYB/QTM courses and CSE/CYB/QTM majors:
+
+
+Useful references:
+
+Looking for CSE/CYB electives and QTM track courses? Here is what's available this fall.
+Here are the advising flowcharts (scroll to the bottom of the page)
+Computer Science
+Software Engineering
+Cybersecurity
+Quantum Computing
+
+Does your Miami Plan say you need "Signature Inquiry" courses? Did you know that there are Signature Inquiry courses that also count as Perspectives Area courses?
+
+Here is a link that lists the available fall Signature Inquiry courses in Oxford that also count as Perspectives Areas.
+Note that a course can count as a Signature Inquiry + Perspectives Area, but…
+A course cannot count as two different Perspectives Areas.
+
+Did you know?
+
+There are many CSE/CYB electives available this fall. You do not need to wait until you are a junior or senior to take electives. If you find something of interest, you should sign up for it as long as you have met the prerequisites.
+
+Things you should know before registering:
+
+Check BannerWeb for your time tickets. Time tickets are based on earned credit hours (hours earned for completed courses, but not for courses you are currently taking). If you have a friend who is able to register earlier than you, it is because your friend either has priority registration, or because your friend has more earned credit hours.
+Some courses have restrictions that will be removed on or after April 27. See details below.
+
+Are you a graduate student who is unable to sign up for a 500- or 600-level CSE course?
+
+If you are a graduate student, but not in Computer Science, you will need to do two things before you can be considered for CSE graduate courses:
+Submit an ROR for the course by logging in at https://miamioh.edu/courselist
+E-mail the instructor of the course to discuss your background. The instructor will need to e-mail cseadvising@miamioh.edu confirming that you have the needed background
+After you have completed the above steps, and sometime on or after April 29, your ROR will be reviewed. If there is room in the course and you have received instructor approval, we will try to add you to the course.
+
+If you are having difficulty signing up for a non-CSE course:
+
+Contact the department that offers the course. The CSE department is not able to add you to non-CSE courses.
+
+If you are having difficulty signing up for a CSE course:
+
+First, check the table at the bottom of this document for the course that you are trying to add. It may be locked for you until open registration. Any RORs submitted for courses that are locked for some majors until open registration will be denied.
+Otherwise, submit a ROR request by logging in at https://miamioh.edu/courselist. Do not e-mail the professor of the course. 
+Do not submit ROR requests for section changes. ROR is unable to handle section change requests. Only use ROR for courses when you are not signed up for a section of that course.
+During your first registration window, you are limited to 18 credit hours. If you submit a ROR request that would cause you to go over 18 hours, it cannot be processed. When registration reopens on April 27, the limit will change to 20 hours.
+Note that you may incur an overload fee on your bursar account if you go above 18 credit hours. Reach out to OneStop for more information about this
+Some ROR requests can be processed right away, but many will take a few weeks to process depending on the course.
+
+Still not sure? Contact your CSE advisor. 
+
+You can find your advisor by searching for who is my advisor in the search bar of the MyMiami page
+
+Course
+
+Notes
+
+BIO/MBI 116
+
+Do not take this course if you have AP Biology credit unless you are also a BIO/MBI major.
+
+
+On the Oxford campus, BIO/MBI 116 is initially limited to Biology majors and other majors who are required to take it. During your initial registration window, if you wish to take 116 you should submit a ROR request by logging in here http://miamioh.edu/courselist. After all students have had their initial registration, add requests will be filled if there are seats remaining. Submitting a request is not a guarantee that you will get added to the class. If you submit a request, note:
+
+BIO 116 and MBI 116 are the same course. You will have a better chance of being added during open registration if you submit a registration override request for both BIO and MBI sections that work with your schedule.
+Be flexible in the sections you request. A student who requests a few sections is generally more likely to get into the course than a student who requests only one section. (Because of the way RORs work, do not request all sections. Instead, prioritize by requesting a few sections.)
+Physics courses
+
+PHY 191
+
+PHY 181 + 183
+
+
+PHY 191 is no longer being offered. If PHY 191 is an option on your degree that you wish to fulfill, you should instead sign up for a section of PHY 181 (the lecture) and a section of PHY 183 (the lab).
+
+
+Similarly, PHY 192 has been replaced with PHY 182 (lecture) plus PHY 184 (lab).
+
+CEC 101
+
+This is a required course for students beginning prior to fall 2023. If you have not taken one of the following courses, you should contact cseadvising@miamioh.edu for assistance in selecting a course if this requirement is not complete.
+
+CSE 102
+
+(only applies to students who began before fall 2023)
+
+If you are a student with a catalog year before fall 2023, CSE 102 is a required course, but is no longer offered.
+
+If you have already taken CEC/CPB/ECE/MME 102 or CSE 151, then you do not need to take CSE 102.
+If you have not taken CEC/CPB/ECE/MME 102 or CSE 151, then you should sign up for CEC 112
+CSE 174
+
+No restrictions.  Any student can register.  There is a math prerequisite.  If you are having trouble getting in, it's probably due to that math prerequisite.  Any problems, contact cseadvising@miamioh.edu.
+
+CSE 201
+
+Previously, the prerequisite was CSE 274. Now, CSE 274 is a corequisite. That means you can take CSE 201 and 274 in the same semester. And, it's still ok to take CSE 274 before CSE 201.
+
+CSE 202
+
+(previously CSE 322)
+
+Software Engineering requirement. Restricted to Software Engineering majors until April 27, then open to all majors.  Don't submit an ROR request.  Just check for seats on or after April 27.
+Previously, the prerequisite was CSE 201. Now, CSE 201 is a corequisite. That means you can take CSE 201 and 202 in the same semester. And, it's still ok to take CSE 201 before CSE 202.
+CSE 212
+
+Software Engineering requirement. Restricted to Software Engineering majors until April 27, then open to all majors.  If you are not a Software Engineering major, don't submit an ROR request.  Just check for seats on or after April 27.
+Software Engineering majors who began before fall 2023: If you have taken CSE 271, then you can take this course. If you get a "prerequisite error" but have taken CSE 271, submit a ROR explaining that you have taken the old prerequisite.
+Software Engineering majors who began fall 2023: The prerequisite is CSE 201.
+CSE 251
+
+Introduction to Game Programming
+
+Not open to CSE majors unless you have a major or minor declared that requires this course. If you do, submit a ROR
+CSE 289
+
+AI in Games
+
+Prerequisite is CSE 232 OR CSE 271
+
+This course is counted as a top-tier elective for Computer Science majors
+This course is counted as an affiliate elective for Software Engineering majors
+This course does not count for Cybersecurity majors
+CSE 439
+
+AI Robustness and Privacy
+
+Prerequisites are CYB 134 and (CSE 232 or CSE 274)
+
+This course is counted as a top-tier elective for Computer Science majors
+This course is counted as an affiliate elective for Software Engineering majors
+This course counts as an elective for Cybersecurity majors
+CSE 448
+
+This is the first half of the CSE 448/449 senior design project, and is open to students with senior standing (usually 93 earned credit hours, not counting current enrollment).
+
+If you are a CS or SE student planning to graduate in May 2027, but do not yet have senior standing, we can probably help you add CSE 448 to your fall schedule. Submit a CSE 448 ROR request here and indicate that you will be graduating in May 2027.
+Cybersecurity students should NOT register for CSE 448. CYB 437 will be offered in Spring 2027
+CSE 478
+
+Soft Computing Techniques for Optimization
+
+Prerequisites are (CSE 274 or CSE 232) and (MTH 231 or MTH 251 or MTH 331)
+
+If you have MTH 251 but not MTH 231 or MTH 331, then you will need to submit an ROR to be added to this course
+This course is counted as a top-tier elective for Computer Science and Software Engineering majors
+This course does not count for Cybersecurity majors
+CYB 234
+
+System Administration and Scripting for Cybersecurity
+
+Cybersecurity requirement. Restricted to Cybersecurity majors until April 27, then open to all majors.  If you are not a Cybersecurity major, don't submit an ROR request.  Just check for seats on or after April 27.
+CYB 235
+
+Computer Network Design and Administration
+
+Cybersecurity requirement. Restricted to Cybersecurity majors until April 27, then open to all majors.  If you are not a Cybersecurity major, don't submit an ROR request.  Just check for seats on or after April 27.
+CYB 236
+
+Data Security
+
+Cybersecurity requirement. Restricted to Cybersecurity majors until April 27, then open to all majors.  If you are not a Cybersecurity major, don't submit an ROR request.  Just check for seats on or after April 27.
+CYB 334
+
+Network Security
+
+prerequisites of CYB 235 and 236
+
+This course is counted as a top-tier elective for Computer Science and Software Engineering majors
+QTM 161
+
+Quantum Computing Basics
+
+Prerequisites are MTH 151 and CSE 174
+
+This course counts during only the 2026-2027 academic year as an affiliate elective for Computer Science and Software Engineering majors
+This course dos not count for Cybersecurity majors
+This course is a core requirement for Quantum Computing majors

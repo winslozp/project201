@@ -21,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
         !pauseSessionBtn ||
         !stopSessionBtn ||
         !typingStatus ||
-        !saveNotesBtn ||
         !saveFileBtn ||
         !saveFileNameInput ||
         !downloadNotesBtn ||
@@ -168,50 +167,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // Save note to server with title (first line or truncated), content, word count, duration, and computed WPM; handle UI states and errors.
-    saveNotesBtn.addEventListener("click", async () => {
-        const content = notesArea.value;
-        if (!content.trim()) {
-            setStatus("Nothing to save — add some notes first.");
-            return;
-        }
-
-        const firstLine = content.trim().split("\n")[0];
-        const title = firstLine.length > 80 ? `${firstLine.slice(0, 77)}...` : firstLine;
-
-        const wc = getWordCount(content);
-        const payload = {
-            title,
-            content,
-            wpm: computeWpm(wc, activeSeconds),
-            duration_seconds: activeSeconds,
-            word_count: wc,
-        };
-
-        saveNotesBtn.disabled = true;
-        setStatus("Saving...");
-
-        try {
-            const res = await fetch("/api/notes", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                credentials: "same-origin",
-                body: JSON.stringify(payload),
-            });
-            const data = await res.json().catch(() => ({}));
-
-            if (res.ok && data.ok) {
-                setStatus(`Saved (note #${data.note_id})`);
-            } else if (res.status === 401) {
-                setStatus("Not logged in — refresh and sign in again.");
-            } else {
-                setStatus(data.error || "Save failed.");
+    if (saveNotesBtn) {
+        saveNotesBtn.addEventListener("click", async () => {
+            const content = notesArea.value;
+            if (!content.trim()) {
+                setStatus("Nothing to save — add some notes first.");
+                return;
             }
-        } catch (e) {
-            setStatus("Save failed — check your connection.");
-        } finally {
-            saveNotesBtn.disabled = false;
-        }
-    });
+
+            const firstLine = content.trim().split("\n")[0];
+            const title = firstLine.length > 80 ? `${firstLine.slice(0, 77)}...` : firstLine;
+
+            const wc = getWordCount(content);
+            const payload = {
+                title,
+                content,
+                wpm: computeWpm(wc, activeSeconds),
+                duration_seconds: activeSeconds,
+                word_count: wc,
+            };
+
+            saveNotesBtn.disabled = true;
+            setStatus("Saving...");
+
+            try {
+                const res = await fetch("/api/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "same-origin",
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.ok) {
+                    setStatus(`Saved (note #${data.note_id})`);
+                } else if (res.status === 401) {
+                    setStatus("Not logged in — refresh and sign in again.");
+                } else {
+                    setStatus(data.error || "Save failed.");
+                }
+            } catch (e) {
+                setStatus("Save failed — check your connection.");
+            } finally {
+                saveNotesBtn.disabled = false;
+            }
+        });
+    }
 
 
     // Save note as .txt file on server with optional filename; handle UI states and errors.
