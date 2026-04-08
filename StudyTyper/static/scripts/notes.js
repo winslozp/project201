@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const pauseSessionBtn = document.getElementById("pauseSessionBtn");
     const stopSessionBtn = document.getElementById("stopSessionBtn");
     const typingStatus = document.getElementById("typingStatus");
-    const saveNotesBtn = document.getElementById("saveNotesBtn");
     const saveFileBtn = document.getElementById("saveFileBtn");
     const saveFileNameInput = document.getElementById("saveFileNameInput");
     const downloadNotesBtn = document.getElementById("downloadNotesBtn");
@@ -213,8 +212,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-
-
     // Save note as .txt file on server with optional filename; handle UI states and errors.
     saveFileBtn.addEventListener("click", async () => {
         const content = notesArea.value;
