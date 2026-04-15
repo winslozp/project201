@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const studyCardPrompt = document.getElementById("studyCardPrompt");
     const studyCardContent = document.getElementById("studyCardContent");
     const prevCardBtn = document.getElementById("prevCardBtn");
-    const flipCardBtn = document.getElementById("flipCardBtn");
     const expandCardBtn = document.getElementById("expandCardBtn");
     const nextCardBtn = document.getElementById("nextCardBtn");
     const studyOverlay = document.getElementById("studyOverlay");
@@ -24,7 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayStudyCardPrompt = document.getElementById("overlayStudyCardPrompt");
     const overlayStudyCardContent = document.getElementById("overlayStudyCardContent");
     const overlayPrevCardBtn = document.getElementById("overlayPrevCardBtn");
-    const overlayFlipCardBtn = document.getElementById("overlayFlipCardBtn");
     const overlayNextCardBtn = document.getElementById("overlayNextCardBtn");
 
     if (
@@ -42,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
         !studyCardPrompt ||
         !studyCardContent ||
         !prevCardBtn ||
-        !flipCardBtn ||
         !expandCardBtn ||
         !nextCardBtn ||
         !studyOverlay ||
@@ -53,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
         !overlayStudyCardPrompt ||
         !overlayStudyCardContent ||
         !overlayPrevCardBtn ||
-        !overlayFlipCardBtn ||
         !overlayNextCardBtn
     ) {
         return;
@@ -93,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
         studyCardBtn.disabled = flashcards.length === 0;
         studyCardBtn.classList.remove("is-back");
         prevCardBtn.disabled = flashcards.length === 0;
-        flipCardBtn.disabled = flashcards.length === 0;
         expandCardBtn.disabled = flashcards.length === 0;
         nextCardBtn.disabled = flashcards.length === 0;
         overlayStudyPosition.textContent = flashcards.length ? `Card 1 of ${flashcards.length}` : "No cards loaded";
@@ -103,7 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
         overlayStudyCardBtn.disabled = flashcards.length === 0;
         overlayStudyCardBtn.classList.remove("is-back");
         overlayPrevCardBtn.disabled = flashcards.length === 0;
-        overlayFlipCardBtn.disabled = flashcards.length === 0;
         overlayNextCardBtn.disabled = flashcards.length === 0;
     }
 
@@ -133,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
         studyCardBtn.disabled = false;
         studyCardBtn.classList.toggle("is-back", showingBack);
         prevCardBtn.disabled = false;
-        flipCardBtn.disabled = false;
         expandCardBtn.disabled = false;
         nextCardBtn.disabled = false;
 
@@ -144,7 +137,6 @@ document.addEventListener("DOMContentLoaded", () => {
         overlayStudyCardBtn.disabled = false;
         overlayStudyCardBtn.classList.toggle("is-back", showingBack);
         overlayPrevCardBtn.disabled = false;
-        overlayFlipCardBtn.disabled = false;
         overlayNextCardBtn.disabled = false;
     }
 
@@ -441,14 +433,6 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     });
 
-    flipCardBtn.addEventListener("click", () => {
-        if (!flashcards.length) {
-            return;
-        }
-        showingBack = !showingBack;
-        renderStudyCard();
-    });
-
     expandCardBtn.addEventListener("click", () => {
         openOverlay();
     });
@@ -462,14 +446,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     overlayStudyCardBtn.addEventListener("click", () => {
-        if (!flashcards.length) {
-            return;
-        }
-        showingBack = !showingBack;
-        renderStudyCard();
-    });
-
-    overlayFlipCardBtn.addEventListener("click", () => {
         if (!flashcards.length) {
             return;
         }

@@ -14,7 +14,6 @@
                 <h1>Flashcards Studio</h1>
                 <p>Select a `.txt` file from your saved server notes and turn it into study cards with Ollama.</p>
             </div>
-            <span class="hero-badge">Saved Notes</span>
         </div>
 
         <div class="flashcards-controls">
@@ -43,10 +42,7 @@
 
     <section class="flashcards-panel study-results-panel">
         <div class="results-head">
-            <div>
-                <h2 class="section-title">Generated Deck</h2>
-                <p class="section-subtitle">Study one card at a time, flip it like Quizlet, and edit any card that needs cleanup.</p>
-            </div>
+            <h2 class="section-title">Generated Deck</h2>
             <span id="deckCount" class="deck-count">0 cards</span>
         </div>
 
@@ -64,7 +60,6 @@
 
             <div class="study-controls">
                 <button type="button" id="prevCardBtn" class="secondary" disabled>Previous</button>
-                <button type="button" id="flipCardBtn" disabled>Flip</button>
                 <button type="button" id="expandCardBtn" class="secondary" disabled>Fullscreen</button>
                 <button type="button" id="nextCardBtn" class="secondary" disabled>Next</button>
             </div>
@@ -95,7 +90,6 @@
 
         <div class="study-controls study-controls-overlay">
             <button type="button" id="overlayPrevCardBtn" class="secondary" disabled>Previous</button>
-            <button type="button" id="overlayFlipCardBtn" disabled>Flip</button>
             <button type="button" id="overlayNextCardBtn" class="secondary" disabled>Next</button>
         </div>
     </div>
