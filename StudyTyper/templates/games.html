@@ -13,15 +13,22 @@
     <p>Type the prompt exactly — one wrong key resets your streak.</p>
 
     <div class="ks-stats">
-        <span>Streak: <strong id="ks-streak">0</strong></span>
-        <span>Best: <strong id="ks-best">0</strong></span>
-        <span id="ks-last-wrap" style="display:none">Last: <strong id="ks-last">0</strong></span>
+        <span>Score: <strong id="ks-score">0</strong></span>
+        <span>Time: <strong id="ks-timer">0.0s</strong></span>
     </div>
 
     <div class="ks-prompt" id="ks-prompt"></div>
 
     <div class="ks-progress-track">
         <div class="ks-progress-bar" id="ks-progress-bar"></div>
+    </div>
+
+    <div class="ks-game-over" id="ks-game-over" style="display:none">
+        <p class="ks-go-title">Game Over</p>
+        <p class="ks-go-stat">Score: <strong id="ks-go-score">0</strong></p>
+        <p class="ks-go-stat">Time: <strong id="ks-go-time">0.0s</strong></p>
+        <p class="ks-go-final">Final: <strong id="ks-go-final">0.00</strong> pts/s</p>
+        <button class="ks-reset-btn" id="ks-go-play-again">Play Again</button>
     </div>
 
     <button class="ks-reset-btn" id="ks-reset-btn">Reset</button>

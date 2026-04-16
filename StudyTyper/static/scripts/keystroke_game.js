@@ -12,18 +12,22 @@ const PROMPTS = [
 
 // --- State ---
 let currentPrompt = "";
-let currentIndex = 0;   // which character the user is on
-let streak = 0;
-let bestStreak = 0;
+let currentIndex  = 0;
+let totalScore    = 0;
+let startTime     = null;
+let timerInterval = null;
 
 // --- DOM references ---
 const promptEl     = document.getElementById("ks-prompt");
-const streakEl     = document.getElementById("ks-streak");
-const bestEl       = document.getElementById("ks-best");
-const lastEl       = document.getElementById("ks-last");
-const lastWrapEl   = document.getElementById("ks-last-wrap");
+const scoreEl      = document.getElementById("ks-score");
+const timerEl      = document.getElementById("ks-timer");
 const progressBar  = document.getElementById("ks-progress-bar");
 const resetBtn     = document.getElementById("ks-reset-btn");
+const gameOverEl   = document.getElementById("ks-game-over");
+const goScoreEl    = document.getElementById("ks-go-score");
+const goTimeEl     = document.getElementById("ks-go-time");
+const goFinalEl    = document.getElementById("ks-go-final");
+const playAgainBtn = document.getElementById("ks-go-play-again");
 
 // Pick a random prompt (avoids repeating the same one twice in a row)
 function getRandomPrompt(exclude) {
@@ -37,7 +41,6 @@ function renderPrompt() {
   for (let i = 0; i < currentPrompt.length; i++) {
     const span = document.createElement("span");
     span.textContent = currentPrompt[i];
-    // dim = upcoming, bright white = current cursor position
     span.className = i === 0 ? "ks-char ks-current" : "ks-char ks-upcoming";
     promptEl.appendChild(span);
   }
@@ -52,12 +55,26 @@ function updateProgress() {
   progressBar.style.width = pct + "%";
 }
 
-// Load a brand new prompt and reset position (but keep best streak)
+// Start the elapsed-time timer
+function startTimer() {
+  if (timerInterval) return;
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    const elapsed = (Date.now() - startTime) / 1000;
+    timerEl.textContent = elapsed.toFixed(1) + "s";
+  }, 100);
+}
+
+// Stop and return elapsed seconds
+function stopTimer() {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  return startTime ? (Date.now() - startTime) / 1000 : 0;
+}
+
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
   currentIndex  = 0;
-  streak        = 0;
-  streakEl.textContent = 0;
   renderPrompt();
 }
 
@@ -67,10 +84,34 @@ function flashPrompt(type) {
   setTimeout(() => promptEl.classList.remove("ks-flash-good", "ks-flash-bad"), 250);
 }
 
+// Show the game-over overlay with final stats
+function showGameOver() {
+  const elapsed = stopTimer();
+  const final   = (totalScore / elapsed);
+
+  goScoreEl.textContent = totalScore;
+  goTimeEl.textContent  = elapsed.toFixed(1) + "s";
+  goFinalEl.textContent = final.toFixed(2);
+
+  promptEl.style.display      = "none";
+  gameOverEl.style.display    = "flex";
+}
+
+// Hide the game-over overlay and start fresh
+function hideGameOver() {
+  promptEl.style.display   = "";
+  gameOverEl.style.display = "none";
+}
+
 // Called on every keypress
 function handleKey(e) {
   // Ignore modifier keys and keys that aren't a single printable character
   if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+  // Ignore input while game-over is showing
+  if (gameOverEl.style.display !== "none") return;
+
+  // Start the timer on the very first keystroke
+  if (!timerInterval && !startTime) startTimer();
 
   const expected = currentPrompt[currentIndex];
 
@@ -83,14 +124,8 @@ function handleKey(e) {
     spans[currentIndex].className = "ks-char ks-done";
 
     currentIndex++;
-    streak++;
-
-    // Update best if needed
-    if (streak > bestStreak) {
-      bestStreak = streak;
-      bestEl.textContent = bestStreak;
-    }
-    streakEl.textContent = streak;
+    totalScore++;
+    scoreEl.textContent = totalScore;
 
     // Highlight the next character as the cursor position
     if (currentIndex < currentPrompt.length) {
@@ -99,38 +134,33 @@ function handleKey(e) {
 
     updateProgress();
 
-    // Finished the whole prompt — load a new one
     if (currentIndex >= currentPrompt.length) {
-      lastEl.textContent   = streak;
-      lastWrapEl.style.display = "inline";
       setTimeout(() => loadNewPrompt(currentPrompt), 400);
     }
 
   } else {
-    // --- Wrong keystroke ---
+    // --- Wrong keystroke — game over ---
     flashPrompt("bad");
-
-    // Show the last score before resetting
-    lastEl.textContent       = streak;
-    lastWrapEl.style.display = "inline";
-
-    // Reset streak and restart prompt from the beginning
-    streak       = 0;
-    currentIndex = 0;
-    streakEl.textContent = 0;
-    renderPrompt();
+    showGameOver();
   }
 }
 
-// Reset button — wipes everything including best streak
-function handleReset() {
+// Full reset — wipes everything
+function fullReset() {
+  stopTimer();
+  startTime  = null;
+  totalScore = 0;
   bestStreak = 0;
-  bestEl.textContent = 0;
-  lastWrapEl.style.display = "none";
+
+  scoreEl.textContent = 0;
+  timerEl.textContent = "0.0s";
+
+  hideGameOver();
   loadNewPrompt(null);
 }
 
 // --- Init ---
-resetBtn.addEventListener("click", handleReset);
+resetBtn.addEventListener("click", fullReset);
+playAgainBtn.addEventListener("click", fullReset);
 window.addEventListener("keydown", handleKey);
 loadNewPrompt(null);
