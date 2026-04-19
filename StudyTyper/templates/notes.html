@@ -35,29 +35,21 @@
         <span id="wpmDisplay" class="notes-metrics-value">—</span>
     </div>
 
-    <textarea id="notesArea" class="notes-area" placeholder="Write your notes here…" rows="18"></textarea>
-
-    <section class="notes-spelling" aria-labelledby="spelling-heading">
-        <h2 id="spelling-heading" class="notes-spelling-title">Spelling</h2>
-        <ul id="spellingErrorsList" class="spelling-list">
-            <li class="spelling-placeholder">Spell check not implemented yet.</li>
-        </ul>
-    </section>
+    <textarea id="notesArea" class="notes-area" placeholder="Write your notes here…" rows="18" spellcheck="true"></textarea>
 
     <div class="notes-summary">
         <button type="button" id="generateSummaryBtn">Generate Summary</button>
         <textarea id="summaryOutput" class="notes-summary-output" placeholder="Your summary will appear here..."
-            rows="10" readonly></textarea>
+            rows="10" readonly spellcheck="true"></textarea>
     </div>
 
     <div class="notes-files">
-        <form action="{{ url_for('upload_notes') }}" method="POST" enctype="multipart/form-data" class="notes-upload">
+        <div class="notes-upload">
             <label class="notes-upload-label">
                 <span>Open .txt</span>
                 <input type="file" id="notesFileInput" name="notes_file" accept=".txt,text/plain">
             </label>
-            <button type="submit">Upload copy to server</button>
-        </form>
+        </div>
         <div class="notes-save-file">
             <label class="notes-upload-label" for="saveFileNameInput">Filename</label>
             <input type="text" id="saveFileNameInput" class="notes-filename-input" placeholder="my-notes.txt"
@@ -69,8 +61,7 @@
             <strong>Save note</strong> stores your text in the app database.
             <strong>Save to server</strong> writes a .txt in your account folder on this server.
             <strong>Download to device</strong> saves a .txt on your computer (Downloads).
-            Choosing <strong>Open .txt</strong> loads the file into the editor; <strong>Upload copy to server</strong>
-            also keeps a backup in your server folder.
+            Choosing <strong>Open .txt</strong> loads the file into the editor.
         </p>
 
         <section class="notes-my-files" aria-labelledby="my-files-heading">

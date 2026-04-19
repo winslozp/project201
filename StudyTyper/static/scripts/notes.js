@@ -1,4 +1,4 @@
-// Live WPM from word count ÷ active typing time; idle (2s) pauses the timer; Stop shows final average.
+// Live WPM via standard formula (total chars ÷ 5 ÷ elapsed minutes); idle (2s) pauses the timer; Stop shows final average.
 document.addEventListener("DOMContentLoaded", () => {
     const notesArea = document.getElementById("notesArea");
     const startSessionBtn = document.getElementById("startSessionBtn");
@@ -48,10 +48,10 @@ document.addEventListener("DOMContentLoaded", () => {
         return trimmed.split(/\s+/).length;
     }
 
-    function computeWpm(wordCount, seconds) {
+    function computeWpm(charCount, seconds) {
         if (seconds <= 0) return 0;
         const minutes = seconds / 60;
-        const wpm = Math.round(wordCount / minutes);
+        const wpm = Math.round((charCount / 5) / minutes);
         return isFinite(wpm) ? wpm : 0;
     }
 
@@ -86,8 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!sessionStarted) {
             return;
         }
-        const wc = getWordCount(notesArea.value);
-        wpmDisplay.textContent = String(computeWpm(wc, activeSeconds));
+        wpmDisplay.textContent = String(computeWpm(notesArea.value.length, activeSeconds));
     }
 
     // Event Listeners
@@ -126,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!sessionStarted) return;
 
         const wc = getWordCount(notesArea.value);
-        const finalWpm = computeWpm(wc, activeSeconds);
+        const finalWpm = computeWpm(notesArea.value.length, activeSeconds);
 
         sessionStarted = false;
         manuallyPaused = false;
@@ -182,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const payload = {
                 title,
                 content,
-                wpm: computeWpm(wc, activeSeconds),
+                wpm: computeWpm(content.length, activeSeconds),
                 duration_seconds: activeSeconds,
                 word_count: wc,
             };
@@ -320,7 +319,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
             notesArea.value = text;
-            setStatus(`Loaded “${file.name}” — keep editing, then Save note / Save to server / Download.`);
+            setStatus(`Loaded “${file.name}” — keep editing, then Save to server / Download.`);
             notesFileInput.value = "";
         };
         reader.onerror = () => {
@@ -362,10 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
                 myFilesContainer.innerHTML = "";
-                const up = data.uploads || [];
                 const sv = data.saved || [];
-                const hasAny = up.length > 0 || sv.length > 0;
-                if (!hasAny) {
+                if (!sv.length) {
                     myFilesContainer.innerHTML =
                         '<p class="my-files-empty">No .txt files saved yet.</p>';
                     return;
@@ -406,7 +403,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     myFilesContainer.appendChild(ul);
                 }
 
-                renderGroup("Uploads (upload copy to server)", up, "uploads");
                 renderGroup("Saved (Save to server)", sv, "saved");
             } catch (e) {
                 myFilesContainer.innerHTML =

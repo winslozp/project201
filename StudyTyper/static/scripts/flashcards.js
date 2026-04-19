@@ -177,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <label class="flashcard-editor-label" for="term-${index}">Term</label>
                                 <input id="term-${index}" class="flashcard-editor-input" data-edit-term="${index}" value="${escapeHtml(card.draftTerm ?? card.term)}">
                                 <label class="flashcard-editor-label" for="definition-${index}">Definition</label>
-                                <textarea id="definition-${index}" class="flashcard-editor-textarea" data-edit-definition="${index}" rows="4">${escapeHtml(card.draftDefinition ?? card.definition)}</textarea>
+                                <textarea id="definition-${index}" class="flashcard-editor-textarea" data-edit-definition="${index}" rows="4" spellcheck="true">${escapeHtml(card.draftDefinition ?? card.definition)}</textarea>
                                 <div class="flashcard-editor-actions">
                                     <button type="button" class="secondary" data-save-card="${index}">Save</button>
                                 </div>
