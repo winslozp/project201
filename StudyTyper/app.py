@@ -506,11 +506,12 @@ def generate_summary_with_ollama(text):
     try:
         return _generate_with_ollama(
             prompt=f"""
-            You are a helpful study assistant.
 
             Summarize the following notes into:
             - A short paragraph summary
             - 5 bullet point key ideas
+
+            Do not ask follow up questions
 
             Notes:
             {text}
@@ -523,8 +524,7 @@ def generate_summary_with_ollama(text):
 
 def generate_flashcards_with_ollama(text):
     prompt = f"""
-    You are a helpful study assistant.
-
+    
     Convert the notes below into 6 to 10 study flashcards.
     Focus on important concepts, vocabulary, definitions, processes, and cause/effect relationships.
     Keep each term concise and each definition to 1 or 2 sentences.
