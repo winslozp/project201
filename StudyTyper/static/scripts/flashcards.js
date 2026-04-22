@@ -62,10 +62,12 @@ document.addEventListener("DOMContentLoaded", () => {
     let showingBack = false;
     let overlayOpen = false;
 
+    // Updates the flashcards status message shown in the UI.
     function setStatus(text) {
         flashcardsStatus.textContent = text;
     }
 
+    // Escapes user-provided text before inserting it into HTML.
     function escapeHtml(value) {
         return String(value)
             .replaceAll("&", "&amp;")
@@ -75,10 +77,20 @@ document.addEventListener("DOMContentLoaded", () => {
             .replaceAll("'", "&#39;");
     }
 
+    // Shows how many flashcards are currently loaded in the deck.
     function setDeckCount(count) {
-        deckCount.textContent = `${count} ${count === 1 ? "card" : "cards"}`;
+        let label;
+
+        if (count === 1) {
+            label = "card";
+        } else {
+            label = "cards";
+        }
+
+        deckCount.textContent = `${count} ${label}`;
     }
 
+    // Resets the study view to its default state and message.
     function resetStudyMode(message = "Generate a deck to start studying.") {
         currentCardIndex = 0;
         showingBack = false;
@@ -101,18 +113,21 @@ document.addEventListener("DOMContentLoaded", () => {
         overlayNextCardBtn.disabled = flashcards.length === 0;
     }
 
+    // Displays a placeholder message when no flashcards are available
     function renderPlaceholder(message) {
         flashcardsOutput.innerHTML = `<p class="flashcards-placeholder">${escapeHtml(message)}</p>`;
         setDeckCount(0);
         resetStudyMode("Your selected flashcard will appear here.");
     }
 
+    // Displays an error message in the flashcards output area.
     function renderError(message) {
         flashcardsOutput.innerHTML = `<p class="flashcards-error">${escapeHtml(message)}</p>`;
         setDeckCount(0);
         resetStudyMode("Your selected flashcard will appear here.");
     }
 
+    // Refreshes the main and overlay study cards to match the current card state.
     function renderStudyCard() {
         if (!flashcards.length) {
             resetStudyMode("Your selected flashcard will appear here.");
@@ -140,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
         overlayNextCardBtn.disabled = false;
     }
 
+    // Opens the expanded study overlay for the current flashcard.
     function openOverlay() {
         if (!flashcards.length) {
             return;
@@ -150,12 +166,14 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     }
 
+    // Closes the expanded study overlay and returns to the page view.
     function closeOverlay() {
         overlayOpen = false;
         studyOverlay.hidden = true;
         document.body.classList.remove("study-overlay-open");
     }
 
+    // Renders the full flashcard list and syncs the study view.
     function renderFlashcards() {
         if (!flashcards.length) {
             renderPlaceholder("No flashcards were returned.");
@@ -195,6 +213,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     }
 
+    // Normalizes generated cards and loads them into the current deck.
     function loadDeck(cards) {
         flashcards = (Array.isArray(cards) ? cards : []).map((card) => ({
             term: String(card.term || "").trim(),
@@ -209,6 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFlashcards();
     }
 
+    // Fetches the user's saved files and fills the file picker options.
     async function loadSavedFiles() {
         refreshSavedFilesBtn.disabled = true;
         setStatus("Loading saved files...");
@@ -235,7 +255,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (savedFiles.length === 0) {
                 setStatus("No saved server files yet. Save a note from the Notes page first.");
             } else {
-                setStatus(`Loaded ${savedFiles.length} saved file${savedFiles.length === 1 ? "" : "s"}.`);
+                setStatus("");
             }
         } catch (err) {
             setStatus("Could not load saved files.");
@@ -244,6 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Loads the selected saved file and shows its contents in the preview.
     async function loadSelectedFile(filename) {
         currentFileContent = "";
         currentFileName = "";
@@ -276,6 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Switches the study view to a specific flashcard by index.
     function showCard(index) {
         if (!flashcards.length) {
             return;
@@ -286,6 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     }
 
+    // Toggles edit mode for one flashcard and closes editors on the others.
     function toggleEditCard(index) {
         flashcards = flashcards.map((card, cardIndex) => {
             if (cardIndex !== index) {
@@ -307,6 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFlashcards();
     }
 
+    // Saves the edited term and definition for a flashcard.
     function saveEditedCard(index) {
         const card = flashcards[index];
         if (!card) {

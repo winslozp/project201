@@ -503,6 +503,8 @@ def generate_summary_with_ollama(text):
             - 5 bullet point key ideas
 
             Do not ask follow up questions
+            Your only job is to generate a summary. Do not include any text not related to the summary or the notes.
+            Do not add any new information to the summary that is not in the notes.
 
             Notes:
             {text}
@@ -515,10 +517,12 @@ def generate_summary_with_ollama(text):
 
 def generate_flashcards_with_ollama(text):
     prompt = f"""
-    
+
     Convert the notes below into 6 to 10 study flashcards.
     Focus on important concepts, vocabulary, definitions, processes, and cause/effect relationships.
     Keep each term concise and each definition to 1 or 2 sentences.
+    Your only job is to generate flashcards. Do not include any text not related to the summary or the notes.
+    Do not add any new information not in the notes.
 
     Return JSON only in this exact shape:
     {{

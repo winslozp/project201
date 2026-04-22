@@ -39,22 +39,6 @@
     background: #f1f5f9;
 }
 
-.notes-status {
-    margin: 0;
-    flex: 1 1 100%;
-    font-size: 0.8125rem;
-    color: #64748b;
-    min-height: 1.25em;
-}
-
-@media (min-width: 520px) {
-    .notes-status {
-        flex: 1 1 auto;
-        margin-left: auto;
-        text-align: right;
-    }
-}
-
 .notes-metrics {
     display: flex;
     align-items: baseline;
