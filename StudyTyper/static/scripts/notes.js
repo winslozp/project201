@@ -124,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
     stopSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
-        const wc = getWordCount(notesArea.value);
         const finalWpm = computeWpm(notesArea.value.length, activeSeconds);
 
         sessionStarted = false;
