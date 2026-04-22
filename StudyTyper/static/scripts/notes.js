@@ -260,14 +260,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const content = notesArea.value;
 
         if (!content.trim()) {
-            setStatus("Nothing to summarize — add some notes first.");
+            setStatus(" Nothing to summarize — add some notes first.");
             summaryOutput.value = "";
             return;
         }
 
         generateSummaryBtn.disabled = true;
         summaryOutput.value = "Generating summary...";
-        setStatus("Generating summary...");
+        setStatus(" Generating summary...");
 
         try {
             const res = await fetch("/api/summarize", {
@@ -281,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (res.ok && data.ok) {
                 summaryOutput.value = data.summary || "";
-                setStatus("Summary generated.");
+                setStatus(" Summary generated.");
             } else if (res.status === 401) {
                 summaryOutput.value = "";
                 setStatus("Not logged in — refresh and sign in again.");
