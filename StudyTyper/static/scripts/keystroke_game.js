@@ -8,25 +8,36 @@ const PROMPTS = [
   "a smooth sea never made a skilled sailor",
   "success is the sum of small efforts repeated daily",
   "the secret to getting ahead is getting started",
+  "fortnite has multiple game modes, using the same engine",
+  "if you can't run then walk, if you can't walk then crawl",
+  "the distance between your dreams and reality is called action",
+  "success is not the absence of failure, it's persistence through failure",
+  "the most difficult thing is the decision to act, the rest is merely tenacity",
+  "i didn't get there by wishing for it or hoping for it, but by working for it",
+  "first forget inspiration, habit is more dependable",
+  "strive not to be a success, but rather to be of value",
+  "stay afraid, but do it anyway, what is important is the action",
+  "think not what the country can do for you, but what you can do for your contry",
+  "freedom is the right of all sentient beings"
 ];
 
 // --- State ---
 let currentPrompt = "";
-let currentIndex  = 0;
-let totalScore    = 0;
-let startTime     = null;
+let currentIndex = 0;
+let totalScore = 0;
+let startTime = null;
 let timerInterval = null;
 
 // --- DOM references ---
-const promptEl     = document.getElementById("ks-prompt");
-const scoreEl      = document.getElementById("ks-score");
-const timerEl      = document.getElementById("ks-timer");
-const progressBar  = document.getElementById("ks-progress-bar");
-const resetBtn     = document.getElementById("ks-reset-btn");
-const gameOverEl   = document.getElementById("ks-game-over");
-const goScoreEl    = document.getElementById("ks-go-score");
-const goTimeEl     = document.getElementById("ks-go-time");
-const goFinalEl    = document.getElementById("ks-go-final");
+const promptEl = document.getElementById("ks-prompt");
+const scoreEl = document.getElementById("ks-score");
+const timerEl = document.getElementById("ks-timer");
+const progressBar = document.getElementById("ks-progress-bar");
+const resetBtn = document.getElementById("ks-reset-btn");
+const gameOverEl = document.getElementById("ks-game-over");
+const goScoreEl = document.getElementById("ks-go-score");
+const goTimeEl = document.getElementById("ks-go-time");
+const goFinalEl = document.getElementById("ks-go-final");
 const playAgainBtn = document.getElementById("ks-go-play-again");
 
 // Pick a random prompt (avoids repeating the same one twice in a row)
@@ -72,9 +83,10 @@ function stopTimer() {
   return startTime ? (Date.now() - startTime) / 1000 : 0;
 }
 
+// Loads a new random prompt (not same one in a row) 
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
-  currentIndex  = 0;
+  currentIndex = 0;
   renderPrompt();
 }
 
@@ -87,28 +99,33 @@ function flashPrompt(type) {
 // Show the game-over overlay with final stats
 function showGameOver() {
   const elapsed = stopTimer();
-  const final   = (totalScore / elapsed);
+  const final = (totalScore / elapsed);
 
   goScoreEl.textContent = totalScore;
-  goTimeEl.textContent  = elapsed.toFixed(1) + "s";
+  goTimeEl.textContent = elapsed.toFixed(1) + "s";
   goFinalEl.textContent = final.toFixed(2);
 
-  promptEl.style.display      = "none";
-  gameOverEl.style.display    = "flex";
+  promptEl.style.display = "none";
+  gameOverEl.style.display = "flex";
 }
 
 // Hide the game-over overlay and start fresh
 function hideGameOver() {
-  promptEl.style.display   = "";
+  promptEl.style.display = "";
   gameOverEl.style.display = "none";
 }
 
 // Called on every keypress
 function handleKey(e) {
+  // Ignore input while game-over is showing
+  if (gameOverEl.style.display !== "none") {
+    if (e.key === 'Enter')
+      fullReset();
+    return;
+  }
+
   // Ignore modifier keys and keys that aren't a single printable character
   if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
-  // Ignore input while game-over is showing
-  if (gameOverEl.style.display !== "none") return;
 
   // Start the timer on the very first keystroke
   if (!timerInterval && !startTime) startTimer();
@@ -148,7 +165,7 @@ function handleKey(e) {
 // Full reset — wipes everything
 function fullReset() {
   stopTimer();
-  startTime  = null;
+  startTime = null;
   totalScore = 0;
   bestStreak = 0;
 
