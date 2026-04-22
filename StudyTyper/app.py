@@ -32,32 +32,42 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'dev-secret-key'
 
+## File upload configuration
 UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 ALLOWED_EXTENSIONS = {'txt'}
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB size
 
+
+## Configure upload folder and max file size
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
+# Ensure the upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# Database configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     'sqlite:///' + os.path.join(BASE_DIR, 'users.db').replace('\\', '/')
 )
+
+# Disable SQLAlchemy event system to save resources since we don't need it
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Initialize the database
 db = SQLAlchemy(app)
 
 
 # -----------------
 # Database Model
 # -----------------
+
+# User moder for authenrication
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
-
+# Note model to store user notes and metadata
 class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -67,6 +77,7 @@ class Note(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
 
+# TypingSession model to track typing practice sessions and metrics
 class TypingSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -76,28 +87,28 @@ class TypingSession(db.Model):
     word_count = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-
+# Get the user based on session
 def current_user():
     if "username" not in session:
         return None
     return User.query.filter_by(username=session["username"]).first()
 
-
+# Handles user-specific directories for uploads and saved files
 def user_upload_dir(user_id):
     p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'uploads')
     os.makedirs(p, exist_ok=True)
     return p
 
-
+# Handles directory for uploading and saving notes
 def user_saved_dir(user_id):
     p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'saved')
     os.makedirs(p, exist_ok=True)
     return p
 
-
+# Define allowed folders for user files to prevent path traversal
 USER_FILE_FOLDERS = frozenset({"uploads", "saved"})
 
-
+# Safelt construct a file path for user files, makes sure it is a .txt file
 def _safe_user_txt_path(user_id, folder_key, filename):
     fk = (folder_key or "").strip().lower()
     if fk not in USER_FILE_FOLDERS:
@@ -111,6 +122,7 @@ def _safe_user_txt_path(user_id, folder_key, filename):
         base = user_upload_dir(user_id)
     else:
         base = user_saved_dir(user_id)
+    # full path must be within the user's folder to prevent path traversal
     full = os.path.normpath(os.path.join(base, name))
     abase = os.path.abspath(base)
     afull = os.path.abspath(full)
@@ -121,7 +133,7 @@ def _safe_user_txt_path(user_id, folder_key, filename):
         return None
     return full
 
-
+# List .txt files in a directory with their names and sizes, used for displaying user files
 def _list_txt_files_in_dir(directory):
     out = []
     if not os.path.isdir(directory):
@@ -139,7 +151,7 @@ def _list_txt_files_in_dir(directory):
             continue
     return out
 
-
+# Utility function to parse optional non-negative integers from input, used for WPM
 def _optional_non_negative_int(value):
     if value is None:
         return None
@@ -151,12 +163,12 @@ def _optional_non_negative_int(value):
         return None
     return n
 
-
+# makes sure ollama is available before using
 def _ensure_ollama_available():
     if ollama is None:
         raise RuntimeError("The Python 'ollama' package is not installed.")
 
-
+# Generate text using Ollama with the specified prompt and model, returns the response text.
 def _generate_with_ollama(prompt, model="llama3.2:1b"):
     _ensure_ollama_available()
     client = ollama.Client()
@@ -166,34 +178,15 @@ def _generate_with_ollama(prompt, model="llama3.2:1b"):
         raise RuntimeError("Ollama returned an empty response.")
     return text
 
-
+# Extract JSON payload from text, stripping code fences if present, and parse it into a Python object.
 def _extract_json_payload(text):
-    fenced_match = re.search(r"```(?:json)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
-    candidates = []
-    if fenced_match:
-        candidates.append(fenced_match.group(1).strip())
+    text = text.strip()
+    # Strip code fences if present
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.DOTALL).strip()
+    return json.loads(text)
 
-    first_object = text.find("{")
-    last_object = text.rfind("}")
-    if first_object != -1 and last_object != -1 and last_object > first_object:
-        candidates.append(text[first_object:last_object + 1])
-
-    first_array = text.find("[")
-    last_array = text.rfind("]")
-    if first_array != -1 and last_array != -1 and last_array > first_array:
-        candidates.append(text[first_array:last_array + 1])
-
-    candidates.append(text.strip())
-
-    for candidate in candidates:
-        try:
-            return json.loads(candidate)
-        except json.JSONDecodeError:
-            continue
-
-    raise ValueError("Could not parse JSON from the Ollama response.")
-
-
+# Make sure each card has a term and a definition 
 def _normalize_flashcards(payload):
     cards = payload.get("flashcards") if isinstance(payload, dict) else payload
     if not isinstance(cards, list):
@@ -222,6 +215,8 @@ with app.app_context():
 # -----------------
 # LOGIN
 # -----------------
+
+# The login route handles both GET and POST requests. On GET, it renders the login page. On POST, it processes the login form, checks credentials, and redirects to the notes page if successful.
 @app.route('/', methods=['GET', 'POST'])
 def login():
 
@@ -235,8 +230,8 @@ def login():
 
     # Updated so that on login user gets sent to notes page
         if user and check_password_hash(user.password, password):
+            # stores the username in the session
             session['username'] = user.username
-            # ^ This line stores the user
             return redirect(url_for('notes'))
         else:
             message = "Invalid credentials"
@@ -246,7 +241,7 @@ def login():
 
 # -----------------
 # REGISTER
-# -----------------
+# --------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
 
@@ -276,6 +271,8 @@ def register():
 # -----------------
 # NOTES PAGE
 # -----------------
+
+# The notes route checks if the user is logged in by looking for the username in the session. If not logged in, it redirects to the login page. If logged in, it renders the notes page with the username.
 @app.route('/notes')
 def notes():
     if 'username' not in session:
@@ -287,6 +284,9 @@ def notes():
 # -----------------
 # API — NOTES
 # -----------------
+
+# This API endpoint allows authenticated users to create a new note with optional typing session metrics.
+# It validates the input, saves the note and metrics to the database, and returns a JSON response with the note ID.
 @app.route("/api/notes", methods=["POST"])
 def api_create_note():
     user = current_user()
@@ -295,41 +295,32 @@ def api_create_note():
 
     data = request.get_json(silent=True) or {}
     title = (data.get("title") or "").strip()
-    content = data.get("content")
-    if content is None:
-        return jsonify({"ok": False, "error": "Missing content"}), 400
-    if not str(content).strip():
-        return jsonify({"ok": False, "error": "Content cannot be empty"}), 400
+    content = str(data.get("content", "")).strip()
 
-    note = Note(user_id=user.id, title=title, content=str(content))
+    if not content:
+        return jsonify({"ok": False, "error": "Content is required"}), 400
+
+    note = Note(user_id=user.id, title=title, content=content)
     db.session.add(note)
     db.session.flush()
 
     wpm = _optional_non_negative_int(data.get("wpm"))
-    duration_seconds = _optional_non_negative_int(data.get("duration_seconds"))
+    duration = _optional_non_negative_int(data.get("duration_seconds"))
     word_count = _optional_non_negative_int(data.get("word_count"))
-    has_metrics = any(v is not None for v in (wpm, duration_seconds, word_count))
-    if has_metrics:
-        typing_session = TypingSession(
+
+    if any(v is not None for v in (wpm, duration, word_count)):
+        db.session.add(TypingSession(
             user_id=user.id,
             note_id=note.id,
             wpm=wpm,
-            duration_seconds=duration_seconds,
+            duration_seconds=duration,
             word_count=word_count,
-        )
-        db.session.add(typing_session)
+        ))
 
     db.session.commit()
+    return jsonify({"ok": True, "note_id": note.id, "message": "Note saved"}), 201
 
-    return jsonify(
-        {
-            "ok": True,
-            "note_id": note.id,
-            "message": "Note saved",
-        }
-    ), 201
-
-
+# API endpoint to save text content to a .txt file in the user's folder
 @app.route("/api/save-text-file", methods=["POST"])
 def api_save_text_file():
     """Write textarea content to a .txt file under the current user's saved folder only."""
@@ -513,6 +504,7 @@ def generate_summary_with_ollama(text):
 
             Do not ask follow up questions
             Your only job is to generate a summary. Do not include any text not related to the summary or the notes.
+            Do not add any new information to the summary that is not in the notes.
 
             Notes:
             {text}
@@ -530,6 +522,7 @@ def generate_flashcards_with_ollama(text):
     Focus on important concepts, vocabulary, definitions, processes, and cause/effect relationships.
     Keep each term concise and each definition to 1 or 2 sentences.
     Your only job is to generate flashcards. Do not include any text not related to the summary or the notes.
+    Do not add any new information not in the notes.
 
     Return JSON only in this exact shape:
     {{

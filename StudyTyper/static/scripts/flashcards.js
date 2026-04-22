@@ -79,7 +79,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Shows how many flashcards are currently loaded in the deck.
     function setDeckCount(count) {
-        deckCount.textContent = `${count} ${count === 1 ? "card" : "cards"}`;
+        let label;
+
+        if (count === 1) {
+            label = "card";
+        } else {
+            label = "cards";
+        }
+
+        deckCount.textContent = `${count} ${label}`;
     }
 
     // Resets the study view to its default state and message.
