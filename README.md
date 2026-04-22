@@ -1,5 +1,7 @@
 # project201
 
+## Anthony Newsome, Zander Winslow, Grady Pattison, Kayden Ament, Nick McGuire
+
 StudyTyper is a Flask app for writing notes, generating summaries with Ollama, and turning saved notes into flashcards.
 
 ## Requirements
