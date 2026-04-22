@@ -1,5 +1,5 @@
 .keystroke-game {
-    background: #111;
+    background: #00194c;
     border: 1px solid #2a2a2a;
     border-radius: 16px;
     padding: 2rem;
@@ -28,7 +28,7 @@
 }
 
 .ks-stats strong {
-    color: #33ff99;
+    color: #ffa033;
 }
 
 .ks-prompt {
@@ -44,16 +44,16 @@
     word-break: break-word;
 }
 
-.ks-char.ks-done     { color: #33ff99; }
+.ks-char.ks-done     { color: #ffa033; }
 .ks-char.ks-current  { color: #ffffff; font-weight: bold; text-decoration: underline; }
 .ks-char.ks-upcoming { color: #444; }
 
-.ks-prompt.ks-flash-good { border-color: #33ff99; }
+.ks-prompt.ks-flash-good { border-color: #ffa033; }
 .ks-prompt.ks-flash-bad  { border-color: #ff4444; }
 
 .ks-progress-track {
     height: 6px;
-    background: #222;
+    background: #001237;
     border-radius: 999px;
     overflow: hidden;
     margin-bottom: 1.25rem;
@@ -62,7 +62,7 @@
 .ks-progress-bar {
     height: 100%;
     width: 0%;
-    background: #33ff99;
+    background: #ffa033;
     border-radius: 999px;
     transition: width 0.1s ease;
 }
@@ -123,6 +123,6 @@
 }
 
 .ks-go-final strong {
-    color: #33ff99;
+    color: #ffa033;
     font-size: 1.3rem;
 }
