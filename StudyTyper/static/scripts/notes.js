@@ -124,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
     stopSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
-        const wc = getWordCount(notesArea.value);
         const finalWpm = computeWpm(notesArea.value.length, activeSeconds);
 
         sessionStarted = false;
@@ -246,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // A comment
+    // Loads the user's saved text files from the server and will display them in the My Files section.
 
     // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {
