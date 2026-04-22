@@ -188,14 +188,14 @@
     padding: 1.25rem;
     border: 1px solid #cbd5e1;
     border-radius: 16px;
-    background: linear-gradient(135deg, #0f172a, #1e293b);
+    background: #6f92d9;
     color: #fff;
     cursor: pointer;
     text-align: center;
 }
 
 .study-card.is-back {
-    background: linear-gradient(135deg, #1d4ed8, #1e40af);
+    background: #ff9f40;
 }
 
 .study-card:disabled {
@@ -253,7 +253,7 @@
 
 .study-controls button.secondary {
     background: #fff;
-    color: #334155;
+    color: #646464;
 }
 
 .study-controls button:disabled {
