@@ -11,7 +11,7 @@
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0 0 0.75rem 0;
-    color: #0f172a;
+    color: #6f92d9;
 }
 
 .notes-toolbar {
@@ -56,7 +56,7 @@
 .notes-metrics-value {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
-    color: #0f172a;
+    color: #6f92d9;
 }
 
 .notes-spelling {

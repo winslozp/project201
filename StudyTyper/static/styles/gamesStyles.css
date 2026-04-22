@@ -1,5 +1,5 @@
 .keystroke-game {
-    background: #00194c;
+    background: #6f92d9;
     border: 1px solid #2a2a2a;
     border-radius: 16px;
     padding: 2rem;
@@ -15,7 +15,7 @@
 
 .keystroke-game > p {
     margin: 0 0 1.25rem 0;
-    color: #666;
+    color: #252525;
     font-size: 0.9rem;
 }
 
@@ -24,7 +24,7 @@
     gap: 1.5rem;
     margin-bottom: 1.25rem;
     font-size: 0.95rem;
-    color: #888;
+    color: #252525;
 }
 
 .ks-stats strong {
@@ -35,7 +35,7 @@
     font-size: 1.2rem;
     line-height: 2;
     letter-spacing: 0.04em;
-    background: #1a1a1a;
+    background: #3c517b;
     border-radius: 8px;
     padding: 1rem 1.25rem;
     margin-bottom: 1rem;
@@ -46,14 +46,14 @@
 
 .ks-char.ks-done     { color: #ffa033; }
 .ks-char.ks-current  { color: #ffffff; font-weight: bold; text-decoration: underline; }
-.ks-char.ks-upcoming { color: #444; }
+.ks-char.ks-upcoming { color: #252525; }
 
 .ks-prompt.ks-flash-good { border-color: #ffa033; }
 .ks-prompt.ks-flash-bad  { border-color: #ff4444; }
 
 .ks-progress-track {
     height: 6px;
-    background: #001237;
+    background: #3f60a2;
     border-radius: 999px;
     overflow: hidden;
     margin-bottom: 1.25rem;
@@ -70,7 +70,7 @@
 .ks-reset-btn {
     background: transparent;
     border: 1px solid #333;
-    color: #777;
+    color: #252525;
     padding: 0.4rem 1rem;
     border-radius: 6px;
     cursor: pointer;
@@ -90,7 +90,7 @@
     flex-direction: column;
     align-items: center;
     gap: 0.6rem;
-    background: #1a1a1a;
+    background: #2b3d61;
     border-radius: 8px;
     padding: 1.75rem 2rem;
     margin-bottom: 1rem;
@@ -108,7 +108,7 @@
 
 .ks-go-stat {
     margin: 0;
-    color: #888;
+    color: #252525;
     font-size: 0.95rem;
 }
 
