@@ -320,53 +320,37 @@ def api_create_note():
     db.session.commit()
     return jsonify({"ok": True, "note_id": note.id, "message": "Note saved"}), 201
 
-# API endpoint to save text content to a .txt file in the user's folder
+# Allows users to save a text file with their notes content
 @app.route("/api/save-text-file", methods=["POST"])
 def api_save_text_file():
-    """Write textarea content to a .txt file under the current user's saved folder only."""
     user = current_user()
     if not user:
         return jsonify({"ok": False, "error": "Unauthorized"}), 401
 
     data = request.get_json(silent=True) or {}
-    content = data.get("content")
-    if content is None:
-        content = ""
+    content = data.get("content", "")
     if not isinstance(content, str):
         return jsonify({"ok": False, "error": "Invalid content"}), 400
 
-    raw_name = (data.get("filename") or "").strip()
-    if not raw_name:
+    raw_name = secure_filename((data.get("filename") or "").strip())
+    if not raw_name or raw_name in (".", ".."):
         raw_name = datetime.utcnow().strftime("notes-%Y%m%d-%H%M%S.txt")
+    if not raw_name.lower().endswith(".txt"):
+        raw_name = secure_filename(f"{raw_name}.txt")
 
-    filename = secure_filename(raw_name)
-    if not filename or filename in (".", ".."):
-        filename = datetime.utcnow().strftime("notes-%Y%m%d-%H%M%S.txt")
-    if not filename.lower().endswith(".txt"):
-        filename = f"{filename}.txt"
-        filename = secure_filename(filename)
-
-    save_dir = user_saved_dir(user.id)
-    save_path = os.path.join(save_dir, filename)
+    save_path = os.path.join(user_saved_dir(user.id), raw_name)
 
     try:
+        # Save the content to the file, ensuring it's written as UTF-8 text
         with open(save_path, "w", encoding="utf-8") as f:
+            # Write the content to the file, replacing any characters that can't be encoded with a placeholder
             f.write(content)
     except OSError:
         return jsonify({"ok": False, "error": "Could not write file"}), 500
 
-    return (
-        jsonify(
-            {
-                "ok": True,
-                "filename": filename,
-                "message": "File saved to your folder",
-            }
-        ),
-        201,
-    )
+    return jsonify({"ok": True, "filename": raw_name, "message": "File saved to your folder"}), 201
 
-
+# List the users .txt files 
 @app.route("/api/my-files", methods=["GET"])
 def api_my_files():
     user = current_user()
@@ -380,7 +364,8 @@ def api_my_files():
         }
     )
 
-
+# Get the content of a user file by filename and folder and ensure the user is authorized
+# Return the content as a JSON
 @app.route("/api/my-files/content/<folder>/<filename>", methods=["GET"])
 def api_my_files_content(folder, filename):
     user = current_user()
