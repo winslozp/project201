@@ -4,6 +4,7 @@ const PROMPTS = [
   "practice makes perfect when you type every day",
   "the only way to get better is to keep pushing forward",
   "focus on accuracy before you chase raw speed",
+  "in space nobody can hear you sceam",
   "every keystroke brings you one step closer to mastery",
   "a smooth sea never made a skilled sailor",
   "success is the sum of small efforts repeated daily",
@@ -17,7 +18,7 @@ const PROMPTS = [
   "first forget inspiration, habit is more dependable",
   "strive not to be a success, but rather to be of value",
   "stay afraid, but do it anyway, what is important is the action",
-  "think not what the country can do for you, but what you can do for your contry",
+  "think not what your country can do for you, but what you can do for your country",
   "freedom is the right of all sentient beings"
 ];
 
