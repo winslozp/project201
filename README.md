@@ -11,7 +11,7 @@ StudyTyper is a Flask app for writing notes, generating summaries with Ollama, a
 ## 1. Clone the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/winslozp/project201
 cd project201
 ```
 
