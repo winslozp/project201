@@ -1,8 +1,8 @@
 // --- Prompts to cycle through ---
 const PROMPTS = [
-  "the quick brown fox jumps over the lazy dog",
+  "miami university is a great place to learn and grow",
   "practice makes perfect when you type every day",
-  "consistency is the key to mastering any skill",
+  "the only way to get better is to keep pushing forward",
   "focus on accuracy before you chase raw speed",
   "every keystroke brings you one step closer to mastery",
   "a smooth sea never made a skilled sailor",
