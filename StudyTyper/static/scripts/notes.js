@@ -447,3 +447,8 @@ document.addEventListener("DOMContentLoaded", () => {
         loadMyFiles();
     }
 });
+
+notesArea.addEventListener("paste", (e) => {
+    e.preventDefault();
+    setStatus("Pasting is disabled.");
+});
