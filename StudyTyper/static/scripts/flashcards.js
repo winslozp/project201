@@ -247,7 +247,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (savedFiles.length === 0) {
                 setStatus("No saved server files yet. Save a note from the Notes page first.");
             } else {
-                setStatus(`Loaded ${savedFiles.length} saved file${savedFiles.length === 1 ? "" : "s"}.`);
+                setStatus("");
             }
         } catch (err) {
             setStatus("Could not load saved files.");
