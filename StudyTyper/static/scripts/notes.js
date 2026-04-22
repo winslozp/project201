@@ -246,6 +246,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // A comment
+
     // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {
         const filename = resolveTxtFilename();
