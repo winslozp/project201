@@ -384,6 +384,7 @@ def api_my_files_content(folder, filename):
     )
 
 
+# Allow users to download their .txt files
 @app.route("/api/my-files/download/<folder>/<filename>", methods=["GET"])
 def api_my_files_download(folder, filename):
     user = current_user()
@@ -392,6 +393,7 @@ def api_my_files_download(folder, filename):
     path = _safe_user_txt_path(user.id, folder, filename)
     if not path or not os.path.isfile(path):
         return jsonify({"ok": False, "error": "Not found"}), 404
+    # Use Flask's send_file to send the file as an attachment with the correct filename and mimetype
     return send_file(
         path,
         as_attachment=True,
@@ -403,6 +405,10 @@ def api_my_files_download(folder, filename):
 # -----------------
 # FLASHCARDS PAGE
 # -----------------
+
+# The flashcards route checks if the user is logged in by looking for the username in the session. 
+# If not logged in, it redirects to the login page.
+# If logged in, it renders the flashcards page with the username.
 @app.route('/flashcards', methods=['GET'])
 def flashcards():
     if 'username' not in session:
@@ -414,6 +420,9 @@ def flashcards():
 # -----------------
 # GAMES PAGE
 # -----------------
+
+# The games route checks if the user is logged in by looking for the username in the session.
+# If not logged in, it redirects to the login page.
 @app.route('/games')
 def games():
     if 'username' not in session:
@@ -425,6 +434,8 @@ def games():
 # -----------------
 # LOGOUT
 # -----------------
+
+# The logout route removes the username from the session and redirects the user to the login page.
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -434,10 +445,13 @@ def logout():
 # -----------------
 # FILE UPLOADING
 # -----------------
+
+# Utility function to check if the uploaded file has an allowed extension (in this case, .txt).
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
+# handles POST requests to upload notes files.
+# saves the file to user's directory
 @app.route('/upload_notes', methods=['POST'])
 def upload_notes():
     if 'username' not in session:
@@ -478,6 +492,8 @@ def upload_notes():
 # -----------------
 # NOTE SUMMARIZING WITH LOCAL AI
 # -----------------
+
+# These functions use the Ollama client to generate summaries from user notes
 def generate_summary_with_ollama(text):
     try:
         return _generate_with_ollama(
@@ -499,7 +515,7 @@ def generate_summary_with_ollama(text):
         print("Ollama error:", e)
         return "Error generating summary."
 
-
+# These functions use the Ollama client to generate flashcards from user notes, returning a list of term/definition pairs.
 def generate_flashcards_with_ollama(text):
     prompt = f"""
 
@@ -526,6 +542,7 @@ def generate_flashcards_with_ollama(text):
 
 
 @app.route("/api/summarize", methods=["POST"])
+# API endpoint that takes user notes content, generates a summary using Ollama, and returns the summary as JSON.
 def api_summarize():
     user = current_user()
     if not user:
@@ -546,6 +563,7 @@ def api_summarize():
 
 
 @app.route("/api/flashcards", methods=["POST"])
+# API endpoint that takes user notes content, generates flashcards using Ollama, and returns the flashcards as JSON.
 def api_flashcards():
     user = current_user()
     if not user:
