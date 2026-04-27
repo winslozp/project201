@@ -5,7 +5,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const pauseSessionBtn = document.getElementById("pauseSessionBtn");
     const stopSessionBtn = document.getElementById("stopSessionBtn");
     const typingStatus = document.getElementById("typingStatus");
-    const saveNotesBtn = document.getElementById("saveNotesBtn");
     const saveFileBtn = document.getElementById("saveFileBtn");
     const saveFileNameInput = document.getElementById("saveFileNameInput");
     const downloadNotesBtn = document.getElementById("downloadNotesBtn");
@@ -31,8 +30,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ) {
         return;
     }
-
-    let refreshMyFilesList = () => { };
 
     let sessionStarted = false;
     let manuallyPaused = false;
@@ -164,53 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1000);
 
 
-    // Save note to server with title (first line or truncated), content, word count, duration, and computed WPM; handle UI states and errors.
-    if (saveNotesBtn) {
-        saveNotesBtn.addEventListener("click", async () => {
-            const content = notesArea.value;
-            if (!content.trim()) {
-                setStatus("Nothing to save — add some notes first.");
-                return;
-            }
-
-            const firstLine = content.trim().split("\n")[0];
-            const title = firstLine.length > 80 ? `${firstLine.slice(0, 77)}...` : firstLine;
-
-            const wc = getWordCount(content);
-            const payload = {
-                title,
-                content,
-                wpm: computeWpm(content.length, activeSeconds),
-                duration_seconds: activeSeconds,
-                word_count: wc,
-            };
-
-            saveNotesBtn.disabled = true;
-            setStatus("Saving...");
-
-            try {
-                const res = await fetch("/api/notes", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "same-origin",
-                    body: JSON.stringify(payload),
-                });
-                const data = await res.json().catch(() => ({}));
-
-                if (res.ok && data.ok) {
-                    setStatus(`Saved (note #${data.note_id})`);
-                } else if (res.status === 401) {
-                    setStatus("Not logged in — refresh and sign in again.");
-                } else {
-                    setStatus(data.error || "Save failed.");
-                }
-            } catch (e) {
-                setStatus("Save failed — check your connection.");
-            } finally {
-                saveNotesBtn.disabled = false;
-            }
-        });
-    }
     // Save note as .txt file on server with optional filename; handle UI states and errors.
     saveFileBtn.addEventListener("click", async () => {
         const content = notesArea.value;
@@ -442,12 +392,11 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         myFilesRefreshBtn.addEventListener("click", loadMyFiles);
-        refreshMyFilesList = loadMyFiles;
         loadMyFiles();
     }
-});
 
-notesArea.addEventListener("paste", (e) => {
-    e.preventDefault();
-    setStatus("Pasting is disabled.");
+    notesArea.addEventListener("paste", (e) => {
+        e.preventDefault();
+        setStatus("Pasting is disabled.");
+    });
 });

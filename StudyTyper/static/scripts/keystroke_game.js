@@ -168,7 +168,6 @@ function fullReset() {
   stopTimer();
   startTime = null;
   totalScore = 0;
-  bestStreak = 0;
 
   scoreEl.textContent = 0;
   timerEl.textContent = "0.0s";
