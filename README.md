@@ -61,7 +61,7 @@ git clone https://github.com/winslozp/project201
 cd project201
 ```
 
-## 2. Install Ollama
+## Install Ollama
 
 Download and install Ollama from [ollama.com](https://ollama.com/).
 
