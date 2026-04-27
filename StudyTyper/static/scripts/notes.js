@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // Toggle pause/resume on button click; also pause on idle (2s no typing) and resume on input.
+    // Toggle pause/resume on button click; also pause on idle (2s no typing) and resume on the input.
     pauseSessionBtn.addEventListener("click", () => {
         if (!sessionStarted) return;
 
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // On input, if session is active and not manually paused, mark as actively typing and reset idle timer; on idle, mark as not actively typing and pause timer.
+    // On input, if the session is active and not manually paused, mark as actively typing and reset idle timer; on idle, mark as not actively typing and pause timer.
     notesArea.addEventListener("input", () => {
         if (!sessionStarted || manuallyPaused) return;
 
@@ -195,7 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Loads the user's saved text files from the server and will display them in the My Files section.
+    // Loads the user's saved text files from server and will display them in the My Files section.
 
     // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {
