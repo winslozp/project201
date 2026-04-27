@@ -4,7 +4,7 @@ const PROMPTS = [
   "practice makes perfect when you type every day",
   "the only way to get better is to keep pushing forward",
   "focus on accuracy before you chase raw speed",
-  "in space nobody can hear you sceam",
+  "in space nobody can hear you scream",
   "every keystroke brings you one step closer to mastery",
   "a smooth sea never made a skilled sailor",
   "success is the sum of small efforts repeated daily",
@@ -77,14 +77,14 @@ function startTimer() {
   }, 100);
 }
 
-// Stop and return elapsed seconds
+// Will stop and return elapsed seconds
 function stopTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
   return startTime ? (Date.now() - startTime) / 1000 : 0;
 }
 
-// Loads a new random prompt (not same one in a row) 
+// Will load a new random prompt (not same one in a row)
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
   currentIndex = 0;
