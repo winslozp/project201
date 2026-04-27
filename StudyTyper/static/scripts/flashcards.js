@@ -166,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     }
 
-    // Closes the expanded study overlay and returns to the page view.
+    // Closes the expanded study overlay and will return to the page view.
     function closeOverlay() {
         overlayOpen = false;
         studyOverlay.hidden = true;
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Loads the selected saved file and shows its contents in the preview.
+    // Will load the selected saved file and shows its contents in the preview.
     async function loadSelectedFile(filename) {
         currentFileContent = "";
         currentFileName = "";
@@ -297,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Switches the study view to a specific flashcard by index.
+    // Will switch the study view to a specific flashcard by index.
     function showCard(index) {
         if (!flashcards.length) {
             return;
