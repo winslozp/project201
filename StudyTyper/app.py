@@ -221,7 +221,9 @@ with app.app_context():
 # LOGIN
 # -----------------
 
-# The login route handles both GET and POST requests. On GET, it renders the login page. On POST, it processes the login form, checks credentials, and redirects to the notes page if successful.
+# The login route handles both GET and POST requests. 
+# On GET, it renders the login page. 
+# On POST, it processes the login form, checks credentials, and redirects to the notes page if successful.
 @app.route('/', methods=['GET', 'POST'])
 def login():
 
@@ -277,7 +279,9 @@ def register():
 # NOTES PAGE
 # -----------------
 
-# The notes route checks if the user is logged in by looking for the username in the session. If not logged in, it redirects to the login page. If logged in, it renders the notes page with the username.
+# The notes route checks if the user is logged in by looking for the username in the session. 
+# If not logged in, it redirects to the login page.
+#  If logged in, it renders the notes page with the username.
 @app.route('/notes')
 def notes():
     if 'username' not in session:
@@ -314,6 +318,9 @@ def api_create_note():
     duration = _optional_non_negative_int(data.get("duration_seconds"))
     word_count = _optional_non_negative_int(data.get("word_count"))
 
+    ## If any of the typing session metrics are provided,
+    #  create a new TypingSession object and save it to the database,
+    #  linking it to the created note.
     if any(v is not None for v in (wpm, duration, word_count)):
         db.session.add(TypingSession(
             user_id=user.id,
