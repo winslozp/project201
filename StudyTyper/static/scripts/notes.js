@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Loads the user's saved text files from server and will display them in the My Files section.
+    // Loads user's saved text files from server and will display them in the My Files section.
 
     // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {

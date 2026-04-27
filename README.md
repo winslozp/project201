@@ -43,7 +43,6 @@
   - A typing accuracy game with 20 rotating prompts
   - One wrong keystroke ends the game
   - Tracks score, elapsed time, and points-per-second
-  - Color-coded character feedback (correct = green, next = yellow, upcoming = grey)
   - Visual progress bar showing completion percentage
 
   ---
@@ -55,14 +54,14 @@
 - Git
 - Ollama
 
-## 1. Clone the project
+## Clone the project
 
 ```bash
 git clone https://github.com/winslozp/project201
 cd project201
 ```
 
-## 2. Install Ollama
+## Install Ollama
 
 Download and install Ollama from [ollama.com](https://ollama.com/).
 
@@ -84,7 +83,6 @@ All good to run program now with Ollama AI working
 ```bash
 ollama pull llama3.2:1b
 ```
-
 
 ## Install Python dependencies
 
