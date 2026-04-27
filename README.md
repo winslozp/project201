@@ -61,21 +61,19 @@ git clone https://github.com/winslozp/project201
 cd project201
 ```
 
-## Install Ollama
+## 2. Install Ollama
 
 Download and install Ollama from [ollama.com](https://ollama.com/).
 
-After installing, make sure Ollama is running, then pull the model used by this app:
+Run the Ollama application (Don't worry if nothing pops up, runs in background)
 
-Run Ollama (Don't worry if nothing pops up, runs in background)
-
-To make sure you have Ollama installed properly, run the command “ollama” in terminal
+To make sure you have Ollama installed properly and running, run the command “ollama” in terminal
 
 Install proper Ollama model by typing in terminal “ollama run llama3.2:1b” (For smallest model)
 
 *You can start typing to chat with model. Type /bye to exit *
 
-Run command in terminal of project “pip install ollama”
+Run command in IDE terminal of project “pip install ollama”
 (Use “brew install ollama” on macos)
 
 All good to run program now with Ollama AI working
