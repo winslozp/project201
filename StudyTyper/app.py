@@ -14,9 +14,11 @@ from flask import (
     current_app,
     send_file,
 )
+## SQLAlchemy for database management and user authentication
 from flask_sqlalchemy import SQLAlchemy
-## Security Function for password hashing and verification
+## Werkzeug's secure_filename to safely handle file names for uploads and downloads
 from werkzeug.security import generate_password_hash, check_password_hash
+## secure_filename is used to sanitize file names for safe storage and retrieval, preventing directory traversal and other file-related vulnerabilities.
 from werkzeug.utils import secure_filename
 ## Ollama for local Ai/note summary
 try:
@@ -29,6 +31,10 @@ except ImportError:
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
 
+
+## Configuration
+## In a production environment, you should use a secure, random secret key and keep it secret.
+## For development purposes, we can use a hardcoded key, but this should be changed for production.
 app.config['SECRET_KEY'] = 'dev-secret-key'
 
 ## File upload configuration
@@ -299,6 +305,7 @@ def api_create_note():
     if not content:
         return jsonify({"ok": False, "error": "Content is required"}), 400
 
+    ## Create a new Note object and save it to the database
     note = Note(user_id=user.id, title=title, content=content)
     db.session.add(note)
     db.session.flush()
