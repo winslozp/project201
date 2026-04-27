@@ -576,6 +576,7 @@ def api_flashcards():
 
     try:
         flashcards = generate_flashcards_with_ollama(text)
+        ## Make sure we got a list of flashcards back and that each one has a term and definition
     except Exception as e:
         print("Ollama flashcard error:", e)
         return (

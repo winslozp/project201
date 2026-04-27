@@ -1,8 +1,53 @@
 # project201
 
 ### Anthony Newsome, Zander Winslow, Grady Pattison, Kayden Ament, Nick McGuire
+---                                                                                                                               
+  StudyTyper                                                                                                                      
+                                                                                                                                    
+  StudyTyper is a web-based study productivity application that combines note-taking, typing practice, and AI-powered flashcard   
+  generation to help students study more effectively. It runs entirely locally using Flask and Ollama (a local LLM), so no data is
+  sent to external services.
 
-StudyTyper is a Flask app for writing notes, generating summaries with Ollama, and turning saved notes into flashcards.
+  ---
+  Tech Stack
+
+  - Backend: Python, Flask, Flask-SQLAlchemy, SQLite, Ollama (local AI)
+  - Frontend: HTML5, CSS3, Vanilla JavaScript (no framework)
+  - Security: Werkzeug password hashing, path traversal prevention, session-based auth
+
+  ---
+  Features
+
+  User Authentication
+
+  - Register and log in with a username and password
+  - Passwords are securely hashed; sessions persist across pages
+
+  Notes
+
+  - Write and edit notes in a built-in text editor
+  - Import .txt files from your device
+  - Save notes to the server or download them directly
+  - View and manage all your saved files
+  - Live WPM tracker — measures your typing speed in real time with idle detection and session controls (start/pause/stop)
+  - AI Summary — generates a short paragraph summary plus 5 key bullet points from your notes using a local LLM
+
+  Flashcards
+
+  - Select any saved .txt file and generate 6–10 AI-powered flashcards (term/definition pairs)
+  - Flip cards, navigate through the deck, and study inline or in fullscreen mode
+  - Edit individual cards directly in the browser
+
+  Typing Game (Keystroke Streak)
+
+  - A typing accuracy game with 20 rotating prompts
+  - One wrong keystroke ends the game
+  - Tracks score, elapsed time, and points-per-second
+  - Color-coded character feedback (correct = green, next = yellow, upcoming = grey)
+  - Visual progress bar showing completion percentage
+
+  ---
+
 
 ## Requirements
 
@@ -23,34 +68,27 @@ Download and install Ollama from [ollama.com](https://ollama.com/).
 
 After installing, make sure Ollama is running, then pull the model used by this app:
 
+Run Ollama (Don't worry if nothing pops up, runs in background)
+
+To make sure you have Ollama installed properly, run the command “ollama” in terminal
+
+Install proper Ollama model by typing in terminal “ollama run llama3.2:1b” (For smallest model)
+
+*You can start typing to chat with model. Type /bye to exit *
+
+Run command in terminal of project “pip install ollama”
+(Use “brew install ollama” on macos)
+
+All good to run program now with Ollama AI working
+
 ```bash
 ollama pull llama3.2:1b
 ```
 
-## 3. Create a virtual environment
 
-### macOS
+## Install Python dependencies
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### Windows PowerShell
-
-```powershell
-py -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-### Windows Command Prompt
-
-```bat
-py -m venv .venv
-.venv\Scripts\activate.bat
-```
-
-## 4. Install Python dependencies
+Go to this website and download python if needed: https://www.python.org/downloads/
 
 ### macOS
 
@@ -66,7 +104,7 @@ py -m pip install --upgrade pip
 py -m pip install -r StudyTyper/requirements.txt
 ```
 
-## 5. Run the app locally
+## Run the app locally
 
 ### macOS
 
@@ -86,13 +124,6 @@ The app will start in Flask debug mode. Open the local address shown in the term
 http://127.0.0.1:5000
 ```
 
-## 6. Using the app
-
-- Register a user account or log in
-- Use the Notes page to type notes, save notes, upload `.txt` files, and generate summaries
-- Save a note to the server if you want to use it for flashcards
-- Open the Flashcards page, choose a saved file, and generate flashcards from it
-- Use Study Mode to flip cards, move between cards, edit individual cards, and open fullscreen study view
 
 ## Project structure
 

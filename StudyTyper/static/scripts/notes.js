@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let activelyTyping = false;
     let activeSeconds = 0;
     let idleTimeout = null;
+    let excludedChars = 0;
 
     const IDLE_DELAY = 2000;
 
@@ -48,7 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
     function computeWpm(charCount, seconds) {
         if (seconds <= 0) return 0;
         const minutes = seconds / 60;
-        const wpm = Math.round((charCount / 5) / minutes);
+        const typedChars = Math.max(0, charCount - excludedChars);
+        const wpm = Math.round((typedChars / 5) / minutes);
         return isFinite(wpm) ? wpm : 0;
     }
 
@@ -89,6 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event Listeners
     startSessionBtn.addEventListener("click", () => {
         activeSeconds = 0;
+        excludedChars = 0;
         sessionStarted = true;
         manuallyPaused = false;
         activelyTyping = false;
@@ -269,6 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
             }
+            excludedChars += text.length;
             notesArea.value = text;
             setStatus(`Loaded “${file.name}” — keep editing, then Save to server / Download.`);
             notesFileInput.value = "";
@@ -384,6 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     setStatus("Could not open that file.");
                     return;
                 }
+                excludedChars += data.content.length;
                 notesArea.value = data.content;
                 setStatus(`Opened “${data.name}” from ${folder}.`);
             } catch (err) {
@@ -396,7 +401,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     notesArea.addEventListener("paste", (e) => {
-        e.preventDefault();
-        setStatus("Pasting is disabled.");
+        const text = (e.clipboardData || window.clipboardData).getData("text");
+        excludedChars += text.length;
     });
 });
