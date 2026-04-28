@@ -127,7 +127,7 @@ def _safe_user_txt_path(user_id, folder_key, filename):
         base = user_upload_dir(user_id)
     else:
         base = user_saved_dir(user_id)
-    # full path must be within the user's folder to prevent path traversal
+    # full path must be within user's folder to prevent path traversal
     full = os.path.normpath(os.path.join(base, name))
     abase = os.path.abspath(base)
     afull = os.path.abspath(full)
@@ -168,7 +168,7 @@ def _optional_non_negative_int(value):
         return None
     return n
 
-# makes sure ollama is available before using
+# Make sure ollama is available before using
 def _ensure_ollama_available():
     if ollama is None:
         raise RuntimeError("The Python 'ollama' package is not installed.")
