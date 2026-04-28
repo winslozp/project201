@@ -156,7 +156,7 @@ def _list_txt_files_in_dir(directory):
             continue
     return out
 
-# Utility function to parse optional non-negative integers from input, used for WPM
+# Utility function to parse optional non-negative integers from input, used for the WPM
 def _optional_non_negative_int(value):
     if value is None:
         return None
