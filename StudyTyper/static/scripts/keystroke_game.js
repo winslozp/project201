@@ -84,7 +84,7 @@ function stopTimer() {
   return startTime ? (Date.now() - startTime) / 1000 : 0;
 }
 
-// Will load a new random prompt (not same one in a row)
+// Will load a new random prompt (not the same one in a row)
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
   currentIndex = 0;
@@ -163,7 +163,7 @@ function handleKey(e) {
   }
 }
 
-// Full reset — wipes everything
+// Full reset — will wipe everything
 function fullReset() {
   stopTimer();
   startTime = null;
