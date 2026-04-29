@@ -120,6 +120,85 @@ The app will start in Flask debug mode. Open the local address shown in the term
 http://127.0.0.1:5000
 ```
 
+## Troubleshooting
+
+### Ollama Issues
+
+**AI features (summaries/flashcards) are not working**
+Ollama must be running in the background whenever you use the app. If you closed the terminal running Ollama, restart it:
+```bash
+ollama serve
+```
+Then refresh the app in your browser.
+
+**`ollama` command not found**
+- On macOS, make sure you installed via `brew install ollama` or downloaded the desktop app from ollama.com
+- Try closing and reopening your terminal after installation
+- On macOS, confirm Homebrew's bin is in your PATH: `echo $PATH` should include `/usr/local/bin` or `/opt/homebrew/bin`
+
+**Model not found / generation fails**
+Make sure you've pulled the model at least once:
+```bash
+ollama pull llama3.2:1b
+```
+
+---
+
+### Python / pip Issues
+
+**`python3` or `py` command not found**
+Download and install Python 3.10+ from https://www.python.org/downloads/ and restart your terminal.
+
+**pip install fails with permission errors (macOS)**
+Use a virtual environment to avoid system-level permission issues:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r StudyTyper/requirements.txt
+```
+You'll need to activate the venv (`source venv/bin/activate`) each time you open a new terminal before running the app.
+
+**`No module named flask` or similar import errors**
+Your dependencies aren't installed, or you're in the wrong virtual environment. Re-run:
+```bash
+python3 -m pip install -r StudyTyper/requirements.txt
+```
+
+---
+
+### App / Flask Issues
+
+**`No such file or directory: StudyTyper/requirements.txt`**
+You're not in the right directory. Make sure you `cd` into the project root first:
+```bash
+cd project201
+```
+
+**Port 5000 already in use**
+Another process is using port 5000. Either kill it or run the app on a different port:
+```bash
+python3 StudyTyper/app.py --port 5001
+```
+Or find and kill the process using port 5000:
+```bash
+# macOS
+lsof -i :5000
+kill -9 <PID>
+```
+
+**App runs but the page won't load**
+Make sure you're opening the correct address shown in your terminal output — usually `http://127.0.0.1:5000`. Do not use `https://`.
+
+**Changes to files aren't reflected in the browser**
+Flask runs in debug mode by default, which auto-reloads on code changes. If it's not reloading, hard-refresh your browser with `Cmd+Shift+R` (macOS) or `Ctrl+Shift+R` (Windows).
+
+---
+
+
+
+**Can't log in / session not persisting**
+Clear your browser cookies for `127.0.0.1` and try registering a new account. The SQLite database is stored locally and resets if deleted.
+
 
 ## Project structure
 
