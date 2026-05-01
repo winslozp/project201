@@ -4,7 +4,7 @@ const PROMPTS = [
   "practice makes perfect when you type every day",
   "the only way to get better is to keep pushing forward",
   "focus on accuracy before you chase raw speed",
-  "in space nobody can hear you scream",
+  "in space nobody can hear you sceam",
   "every keystroke brings you one step closer to mastery",
   "a smooth sea never made a skilled sailor",
   "success is the sum of small efforts repeated daily",
@@ -30,6 +30,7 @@ let startTime = null;
 let timerInterval = null;
 
 // --- DOM references ---
+// used to point to various elements in the page for updating text, styles, and handling interactions.
 const promptEl = document.getElementById("ks-prompt");
 const scoreEl = document.getElementById("ks-score");
 const timerEl = document.getElementById("ks-timer");
@@ -77,14 +78,14 @@ function startTimer() {
   }, 100);
 }
 
-// Will stop and return elapsed seconds
+// Stop and return elapsed seconds
 function stopTimer() {
   clearInterval(timerInterval);
   timerInterval = null;
   return startTime ? (Date.now() - startTime) / 1000 : 0;
 }
 
-// Will load a new random prompt (not the same one in a row)
+// Loads a new random prompt (not same one in a row) 
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
   currentIndex = 0;
@@ -163,11 +164,12 @@ function handleKey(e) {
   }
 }
 
-// Full reset — will wipe everything
+// Full reset — wipes everything
 function fullReset() {
   stopTimer();
   startTime = null;
   totalScore = 0;
+
 
   scoreEl.textContent = 0;
   timerEl.textContent = "0.0s";
@@ -177,6 +179,7 @@ function fullReset() {
 }
 
 // --- Init ---
+// Set up event listeners for the reset and play-again buttons, as well as keypresses for the game.
 resetBtn.addEventListener("click", fullReset);
 playAgainBtn.addEventListener("click", fullReset);
 window.addEventListener("keydown", handleKey);

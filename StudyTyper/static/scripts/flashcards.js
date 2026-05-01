@@ -1,3 +1,6 @@
+// Handles the flashcard generation, display, and study mode interactions on the Flashcards page.
+// This script manages the UI elements, user interactions, and communication with the server to load saved files and generate flashcards based on note content.
+//  It also provides an interface for studying the generated flashcards with a front/back toggle and an expanded view overlay.
 document.addEventListener("DOMContentLoaded", () => {
     const savedFileSelect = document.getElementById("savedFileSelect");
     const refreshSavedFilesBtn = document.getElementById("refreshSavedFilesBtn");
@@ -25,6 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlayPrevCardBtn = document.getElementById("overlayPrevCardBtn");
     const overlayNextCardBtn = document.getElementById("overlayNextCardBtn");
 
+    // Check that all the necessary elements are present in the DOM before proceeding. 
+    // If any are missing, we won't be able to function properly, so we return early.
     if (
         !savedFileSelect ||
         !refreshSavedFilesBtn ||
@@ -55,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
+    // --- State variables ---
     let currentFileContent = "";
     let currentFileName = "";
     let flashcards = [];
@@ -68,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Escapes user-provided text before inserting it into HTML.
+    // This helps prevent XSS vulnerabilities if the flashcard content includes special characters.
     function escapeHtml(value) {
         return String(value)
             .replaceAll("&", "&amp;")
@@ -91,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Resets the study view to its default state and message.
+    // This is used when loading a new deck, when there are no flashcards, or when an error occurs.
     function resetStudyMode(message = "Generate a deck to start studying.") {
         currentCardIndex = 0;
         showingBack = false;
@@ -133,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             resetStudyMode("Your selected flashcard will appear here.");
             return;
         }
-
+        // Get the current card and update the study view with its term or definition based on whether we're showing the front or back.
         const card = flashcards[currentCardIndex];
         studyPosition.textContent = `Card ${currentCardIndex + 1} of ${flashcards.length}`;
         studyCardFaceLabel.textContent = showingBack ? "Back" : "Front";
@@ -145,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         expandCardBtn.disabled = false;
         nextCardBtn.disabled = false;
 
+        // Sync the overlay study card with the same content and state.
         overlayStudyPosition.textContent = `Card ${currentCardIndex + 1} of ${flashcards.length}`;
         overlayStudyCardFaceLabel.textContent = showingBack ? "Back" : "Front";
         overlayStudyCardPrompt.textContent = showingBack ? "Definition" : "Term";
@@ -166,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
         renderStudyCard();
     }
 
-    // Closes the expanded study overlay and will return to the page view.
+    // Closes the expanded study overlay and returns to the page view.
     function closeOverlay() {
         overlayOpen = false;
         studyOverlay.hidden = true;
@@ -179,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
             renderPlaceholder("No flashcards were returned.");
             return;
         }
-
+        // Render each flashcard as an article with its term and definition, along with an edit button to toggle edit mode for that card.
         flashcardsOutput.innerHTML = flashcards
             .map(
                 (card, index) => `
@@ -233,6 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
         refreshSavedFilesBtn.disabled = true;
         setStatus("Loading saved files...");
 
+        // Fetch the list of saved files from the server and populate the dropdown select with those options.
         try {
             const res = await fetch("/api/my-files", { credentials: "same-origin" });
             const data = await res.json().catch(() => ({}));
@@ -264,7 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Will load the selected saved file and shows its contents in the preview.
+    // Loads the selected saved file and shows its contents in the preview.
     async function loadSelectedFile(filename) {
         currentFileContent = "";
         currentFileName = "";
@@ -273,18 +283,19 @@ document.addEventListener("DOMContentLoaded", () => {
         renderPlaceholder("Your generated flashcards will appear here after you select a saved file.");
 
         try {
+            // Fetch the file content from the server for the selected filename.
             const res = await fetch(`/api/my-files/content/saved/${encodeURIComponent(filename)}`, {
                 credentials: "same-origin",
             });
             const data = await res.json().catch(() => ({}));
-
+            // If the response is not OK or doesn't have the expected structure, show an error message.
             if (!res.ok || !data.ok) {
                 selectedFileMeta.textContent = "Could not open file";
                 sourcePreview.textContent = data.error || "Could not load the selected file.";
                 setStatus(data.error || "Could not open that saved file.");
                 return;
             }
-
+            // If the file content is successfully loaded, update the current file variables and show the content in the preview area.
             currentFileName = data.name || filename;
             currentFileContent = data.content || "";
             selectedFileMeta.textContent = currentFileName;
@@ -297,7 +308,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Will switch the study view to a specific flashcard by index.
+    // Switches the study view to a specific flashcard by index.
     function showCard(index) {
         if (!flashcards.length) {
             return;
@@ -356,9 +367,10 @@ document.addEventListener("DOMContentLoaded", () => {
         renderFlashcards();
         setStatus(`Updated card ${index + 1}.`);
     }
-
     refreshSavedFilesBtn.addEventListener("click", loadSavedFiles);
 
+    // When the user selects a different file from the dropdown
+    //  load that file's content for preview and flashcard generation.
     savedFileSelect.addEventListener("change", () => {
         const filename = savedFileSelect.value;
         if (!filename) {
@@ -373,6 +385,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadSelectedFile(filename);
     });
 
+    // When the user clicks the button to generate flashcards from the selected file's content
     generateFlashcardsBtn.addEventListener("click", async () => {
         if (!currentFileName || !currentFileContent.trim()) {
             setStatus("Choose a saved file with note content first.");
@@ -380,10 +393,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Disable the button to prevent multiple clicks and show a status message while generating flashcards.
         generateFlashcardsBtn.disabled = true;
         setStatus(`Generating flashcards from ${currentFileName}...`);
         renderPlaceholder("Generating flashcards...");
 
+        // Send the file content to the server to generate flashcards using the Ollama model.
         try {
             const res = await fetch("/api/flashcards", {
                 method: "POST",
@@ -392,7 +407,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ content: currentFileContent }),
             });
             const data = await res.json().catch(() => ({}));
-
+            // If the response is successful and contains flashcards
+            // load them into the deck and update the status. 
+            // Otherwise, show an error message based on the response.
             if (res.ok && data.ok) {
                 loadDeck(data.flashcards || []);
                 setStatus(`Generated ${data.flashcards.length} flashcards from ${currentFileName}.`);
@@ -411,6 +428,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+
+    // Handle clicks on flashcard items for editing and studying, as well as input events for editing flashcard content.
     flashcardsOutput.addEventListener("click", (event) => {
         const editBtn = event.target.closest("[data-edit-card]");
         if (editBtn) {
@@ -418,18 +437,21 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // If the click was on a save button within an editor, save the changes for that card.
         const saveBtn = event.target.closest("[data-save-card]");
         if (saveBtn) {
             saveEditedCard(Number(saveBtn.dataset.saveCard));
             return;
         }
 
+        // If the click was on a flashcard item (but not on an edit or save button), show that card in the study view.
         const cardEl = event.target.closest("[data-card-index]");
         if (cardEl) {
             showCard(Number(cardEl.dataset.cardIndex));
         }
     });
 
+    // Handle input events on the flashcard editor fields to update the draft term and definition for the card being edited.
     flashcardsOutput.addEventListener("input", (event) => {
         const termInput = event.target.closest("[data-edit-term]");
         if (termInput) {
@@ -440,6 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // If the input event was on a definition field, update the draft definition for that card.
         const definitionInput = event.target.closest("[data-edit-definition]");
         if (definitionInput) {
             const index = Number(definitionInput.dataset.editDefinition);
@@ -449,6 +472,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Handle clicks on the study card buttons to flip the card and navigate between cards, 
+    // as well as opening and closing the expanded study overlay.
     studyCardBtn.addEventListener("click", () => {
         if (!flashcards.length) {
             return;

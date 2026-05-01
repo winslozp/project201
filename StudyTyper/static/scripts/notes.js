@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Event Listeners
     startSessionBtn.addEventListener("click", () => {
         activeSeconds = 0;
-        excludedChars = 0;
+        excludedChars = notesArea.value.length;
         sessionStarted = true;
         manuallyPaused = false;
         activelyTyping = false;
@@ -120,11 +120,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Stop session, show final WPM, and reset all timers/status.
-    stopSessionBtn.addEventListener("click", () => {
+    // Stop session, show final WPM, reset all timers/status, and save note + metrics to DB.
+    stopSessionBtn.addEventListener("click", async () => {
         if (!sessionStarted) return;
 
         const finalWpm = computeWpm(notesArea.value.length, activeSeconds);
+        const content = notesArea.value;
+        const duration = activeSeconds;
 
         sessionStarted = false;
         manuallyPaused = false;
@@ -133,7 +135,29 @@ document.addEventListener("DOMContentLoaded", () => {
         pauseSessionBtn.textContent = "Pause";
 
         wpmDisplay.textContent = String(finalWpm);
-        setStatus(`Session stopped — average ${finalWpm} WPM (${activeSeconds}s active)`);
+        setStatus(`Session stopped — average ${finalWpm} WPM (${duration}s active)`);
+
+        if (content.trim()) {
+            try {
+                const res = await fetch("/api/notes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "same-origin",
+                    body: JSON.stringify({
+                        content,
+                        wpm: finalWpm,
+                        duration_seconds: duration,
+                        word_count: getWordCount(content),
+                    }),
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.ok) {
+                    setStatus(`Session stopped — average ${finalWpm} WPM · Note saved`);
+                }
+            } catch (e) {
+                // save failure is non-critical, status already shows WPM
+            }
+        }
     });
 
 
