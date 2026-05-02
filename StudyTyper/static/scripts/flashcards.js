@@ -1,6 +1,4 @@
-// Handles the flashcard generation, display, and study mode interactions on the Flashcards page.
-// This script manages the UI elements, user interactions, and communication with the server to load saved files and generate flashcards based on note content.
-//  It also provides an interface for studying the generated flashcards with a front/back toggle and an expanded view overlay.
+// Handles flashcard generation from saved notes, deck display, inline editing, and study mode with a fullscreen overlay.
 document.addEventListener("DOMContentLoaded", () => {
     const savedFileSelect = document.getElementById("savedFileSelect");
     const refreshSavedFilesBtn = document.getElementById("refreshSavedFilesBtn");

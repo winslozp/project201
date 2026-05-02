@@ -30,7 +30,7 @@ let startTime = null;
 let timerInterval = null;
 
 // --- DOM references ---
-// used to point to various elements in the page for updating text, styles, and handling interactions.
+// DOM elements used throughout the game for rendering state and handling interactions
 const promptEl = document.getElementById("ks-prompt");
 const scoreEl = document.getElementById("ks-score");
 const timerEl = document.getElementById("ks-timer");
@@ -85,7 +85,7 @@ function stopTimer() {
   return startTime ? (Date.now() - startTime) / 1000 : 0;
 }
 
-// Loads a new random prompt (not same one in a row) 
+// Replaces the current prompt with a new random one and resets the character index
 function loadNewPrompt(exclude) {
   currentPrompt = getRandomPrompt(exclude);
   currentIndex = 0;
@@ -111,13 +111,13 @@ function showGameOver() {
   gameOverEl.style.display = "flex";
 }
 
-// Hide the game-over overlay and start fresh
+// Hides the game-over overlay and restores the prompt display
 function hideGameOver() {
   promptEl.style.display = "";
   gameOverEl.style.display = "none";
 }
 
-// Called on every keypress
+// Processes each keypress: starts the timer on the first key, advances on correct input, ends the game on a wrong key
 function handleKey(e) {
   // Ignore input while game-over is showing
   if (gameOverEl.style.display !== "none") {

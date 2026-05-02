@@ -16,11 +16,11 @@ from flask import (
 )
 ## SQLAlchemy for database management and user authentication
 from flask_sqlalchemy import SQLAlchemy
-## Werkzeug's secure_filename to safely handle file names for uploads and downloads
+## Werkzeug password hashing for storing and verifying user credentials
 from werkzeug.security import generate_password_hash, check_password_hash
-## secure_filename is used to sanitize file names for safe storage and retrieval, preventing directory traversal and other file-related vulnerabilities.
+## secure_filename sanitizes uploaded filenames to prevent path traversal attacks
 from werkzeug.utils import secure_filename
-## Ollama for local Ai/note summary
+## Ollama for local AI-powered note summarization and flashcard generation
 try:
     import ollama
 except ImportError:
@@ -66,7 +66,7 @@ db = SQLAlchemy(app)
 # Database Model
 # -----------------
 
-# User moder for authenrication
+# User model for authentication
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -92,19 +92,19 @@ class TypingSession(db.Model):
     word_count = db.Column(db.Integer, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-# Get the user based on session
+# Returns the logged-in User from the database, or None if the session is unauthenticated
 def current_user():
     if "username" not in session:
         return None
     return User.query.filter_by(username=session["username"]).first()
 
-# Handles user-specific directories for uploads and saved files
+# Returns the uploads directory path for a given user, creating it if it doesn't exist
 def user_upload_dir(user_id):
     p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'uploads')
     os.makedirs(p, exist_ok=True)
     return p
 
-# Handles directory for uploading and saving notes
+# Returns the saved files directory path for a given user, creating it if it doesn't exist
 def user_saved_dir(user_id):
     p = os.path.join(current_app.config['UPLOAD_FOLDER'], 'users', str(user_id), 'saved')
     os.makedirs(p, exist_ok=True)
@@ -113,7 +113,7 @@ def user_saved_dir(user_id):
 # Define allowed folders for user files to prevent path traversal
 USER_FILE_FOLDERS = frozenset({"uploads", "saved"})
 
-# Safelt construct a file path for user files, makes sure it is a .txt file
+# Safely constructs a validated .txt file path within the user's folder, blocking path traversal
 def _safe_user_txt_path(user_id, folder_key, filename):
     fk = (folder_key or "").strip().lower()
     if fk not in USER_FILE_FOLDERS:
@@ -156,7 +156,7 @@ def _list_txt_files_in_dir(directory):
             continue
     return out
 
-# Utility function to parse optional non-negative integers from input, used for the WPM
+# Parses a value as a non-negative integer; returns None if missing, non-numeric, or negative
 def _optional_non_negative_int(value):
     if value is None:
         return None
@@ -168,12 +168,12 @@ def _optional_non_negative_int(value):
         return None
     return n
 
-# Make sure ollama is available before using
+# Raises RuntimeError if the ollama package is not installed
 def _ensure_ollama_available():
     if ollama is None:
         raise RuntimeError("The Python 'ollama' package is not installed.")
 
-# Generate text using Ollama with the specified prompt and model, returns the response text.
+# Sends a prompt to the local Ollama model and returns the response text; raises on empty or failed response
 def _generate_with_ollama(prompt, model="llama3.2:1b"):
     _ensure_ollama_available()
     client = ollama.Client()
@@ -191,7 +191,7 @@ def _extract_json_payload(text):
         text = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.DOTALL).strip()
     return json.loads(text)
 
-# Make sure each card has a term and a definition 
+# Validates the raw AI response, filtering out cards missing a term or definition, and raises if none remain
 def _normalize_flashcards(payload):
     cards = payload.get("flashcards") if isinstance(payload, dict) else payload
     if not isinstance(cards, list):
@@ -235,7 +235,6 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-    # Updated so that on login user gets sent to notes page
         if user and check_password_hash(user.password, password):
             # stores the username in the session
             session['username'] = user.username
@@ -363,7 +362,7 @@ def api_save_text_file():
 
     return jsonify({"ok": True, "filename": raw_name, "message": "File saved to your folder"}), 201
 
-# List the users .txt files 
+# Returns a list of the user's .txt files from their uploads and saved folders
 @app.route("/api/my-files", methods=["GET"])
 def api_my_files():
     user = current_user()
@@ -455,50 +454,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-# -----------------
-# FILE UPLOADING
-# -----------------
-
-# Utility function to check if the uploaded file has an allowed extension (in this case, .txt).
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# handles POST requests to upload notes files.
-# saves the file to user's directory
-@app.route('/upload_notes', methods=['POST'])
-def upload_notes():
-    if 'username' not in session:
-        flash('Please log in to upload files.')
-        return redirect(url_for('login'))
-
-    user = User.query.filter_by(username=session['username']).first()
-    if not user:
-        session.pop('username', None)
-        return redirect(url_for('login'))
-
-    if 'notes_file' not in request.files:
-        flash('No file part found.')
-        return redirect(url_for('notes'))
-
-    file = request.files['notes_file']
-
-    if file.filename == '':
-        flash('No file selected.')
-        return redirect(url_for('notes'))
-
-    if not allowed_file(file.filename):
-        flash('Invalid file type. Only .txt files are allowed.')
-        return redirect(url_for('notes'))
-
-    filename = secure_filename(file.filename)
-    save_dir = user_upload_dir(user.id)
-    save_path = os.path.join(save_dir, filename)
-    file.save(save_path)
-
-    flash(f'File "{filename}" saved to your uploads folder.')
-    return redirect(url_for('notes'))
-
-
 
 
 
@@ -506,7 +461,7 @@ def upload_notes():
 # NOTE SUMMARIZING WITH LOCAL AI
 # -----------------
 
-# These functions use the Ollama client to generate summaries from user notes
+# Builds and sends a summarization prompt to Ollama, returning a paragraph and bullet-point summary
 def generate_summary_with_ollama(text):
     try:
         return _generate_with_ollama(
@@ -528,7 +483,7 @@ def generate_summary_with_ollama(text):
         print("Ollama error:", e)
         return "Error generating summary."
 
-# These functions use the Ollama client to generate flashcards from user notes, returning a list of term/definition pairs.
+# Builds and sends a flashcard generation prompt to Ollama, returning a validated list of term/definition pairs
 def generate_flashcards_with_ollama(text):
     prompt = f"""
 

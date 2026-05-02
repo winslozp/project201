@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const downloadNotesBtn = document.getElementById("downloadNotesBtn");
     const notesFileInput = document.getElementById("notesFileInput");
     const wpmDisplay = document.getElementById("wpmDisplay");
-    // Generate Summary
     const generateSummaryBtn = document.getElementById("generateSummaryBtn");
     const summaryOutput = document.getElementById("summaryOutput");
 
@@ -222,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Loads user's saved text files from server and will display them in the My Files section.
 
     // Download note as .txt file to device with optional filename; handle UI states and errors.
     downloadNotesBtn.addEventListener("click", () => {
@@ -231,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
         setStatus(`Downloaded “${filename}” to your device`);
     });
 
-    // Summary Button
     generateSummaryBtn.addEventListener("click", async () => {
         const content = notesArea.value;
 
