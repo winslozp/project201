@@ -1,9 +1,8 @@
-# Study Typer
+# STUDY TYPER
 
 ### Anthony Newsome, Zander Winslow, Grady Pattison, Kayden Ament, Nick McGuire
----                                                                                                                               
-                                                                                                                 
-                                                                                                                  
+---                                                                                                                                                                                                                                              
+                                                                                                                                    
   StudyTyper is a web-based study productivity application that combines note-taking, typing practice, and AI-powered flashcard   
   generation to help students study more effectively. It runs entirely locally using Flask and Ollama (a local LLM), so no data is
   sent to external services.
@@ -60,25 +59,21 @@
 git clone https://github.com/winslozp/project201
 cd project201
 ```
-[Figure1.png]
 
 ## Install Ollama
 
 Download and install Ollama from [ollama.com](https://ollama.com/).
-[Figure2.png]
 
 Run the Ollama application (Don't worry if nothing pops up, runs in background)
 
 To make sure you have Ollama installed properly and running, run the command “ollama” in terminal
-[Figure3.png]
 
 Install proper Ollama model by typing in terminal “ollama run llama3.2:1b” (For smallest model)
-[Figure4.png]
+
 *You can start typing to chat with model. Type /bye to exit *
 
 Run command in IDE terminal of project “pip install ollama”
 (Use “brew install ollama” on macos)
-[Figure5.png]
 
 All good to run program now with Ollama AI working
 
@@ -86,36 +81,23 @@ All good to run program now with Ollama AI working
 ollama pull llama3.2:1b
 ```
 
-
 ## Install Python dependencies
 
 Go to this website and download python if needed: https://www.python.org/downloads/
-[Figure6.png]
 
 ### macOS
 
 ```bash
 python3 -m pip install --upgrade pip
+pip install -r StudyTyper/requirements.txt
 ```
-[Figure7.png]
-
-```bash
-python3 -m pip install -r StudyTyper/requirements.txt
-```
-[Figure8.png]
 
 ### Windows
 
 ```powershell
 py -m pip install --upgrade pip
-```
-[Figure7.png]
-
-```powershell
 py -m pip install -r StudyTyper/requirements.txt
 ```
-[Figure8.png]
-
 
 ## Run the app locally
 
@@ -161,7 +143,7 @@ ollama pull llama3.2:1b
 
 ---
 
-### Python / pip Issues
+### Python / pip Issues / Not Required
 
 **`python3` or `py` command not found**
 Download and install Python 3.10+ from https://www.python.org/downloads/ and restart your terminal.

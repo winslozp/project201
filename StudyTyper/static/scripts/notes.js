@@ -326,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return `/api/my-files/download/${encodeURIComponent(folder)}/${encodeURIComponent(name)}`;
         }
 
+        // Loads user's saved text files from server and displays them in the My Files section.
         async function loadMyFiles() {
             myFilesContainer.innerHTML = '<p class="my-files-loading">Loading…</p>';
             try {
@@ -344,6 +345,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
 
+                // Renders a group of files in the My Files section.
                 function renderGroup(title, items, folderKey) {
                     if (!items.length) {
                         return;
